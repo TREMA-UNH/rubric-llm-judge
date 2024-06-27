@@ -183,11 +183,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1719507139,
-        "narHash": "sha256-399k6S+acFZGl+H7np84CSZFWUstQTHXxPcsyykg9AI=",
+        "lastModified": 1719528009,
+        "narHash": "sha256-s0+zK9QJ9QrYGUmYkuojN1tNRjif2s8Nhvw+bNlIk4g=",
         "ref": "refs/heads/master",
-        "rev": "f78edf51a06696fbe2b165605edfbae68ee214fa",
-        "revCount": 234,
+        "rev": "09ad83705838488ea48bb113ea42c1ef605cc3bc",
+        "revCount": 237,
         "type": "git",
         "url": "ssh://git@git.smart-cactus.org/ben/exampp.git"
       },
@@ -300,17 +300,17 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1703099725,
-        "narHash": "sha256-E4S57a2uSGkOE1NW3aiqpcD2Uks5w1QHn9yP4ySkZfg=",
+        "lastModified": 1719426051,
+        "narHash": "sha256-yJL9VYQhaRM7xs0M867ZFxwaONB9T2Q4LnGo1WovuR4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "ffb2e65e054b989c55a83f79af0ed4b912e22e14",
+        "rev": "89c49874fb15f4124bf71ca5f42a04f2ee5825fd",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
+        "ref": "nixos-24.05",
         "repo": "nixpkgs",
-        "rev": "ffb2e65e054b989c55a83f79af0ed4b912e22e14",
         "type": "github"
       }
     },
