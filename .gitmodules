@@ -1,0 +1,3 @@
+[submodule "LLMJudge"]
+	path = LLMJudge
+	url = git@github.com:llm4eval/LLMJudge.git
