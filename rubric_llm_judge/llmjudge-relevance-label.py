@@ -1,15 +1,10 @@
 from collections import defaultdict
-import gzip
-import itertools
-import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-from pydantic import BaseModel
+from typing import Dict, List, Tuple
 
-from exam_pp import query_loader, data_model
+from exam_pp import data_model
 from exam_pp.exam_to_qrels import QrelEntry, write_qrel_file 
-from exam_pp.data_model import *
-
+from exam_pp.data_model import FullParagraphData, GradeFilter, parseQueryWithFullParagraphs
 
 def read_llmjudge_qrel_file(qrel_in_file:Path) ->List[QrelEntry]:
     '''Use to read qrel file'''
@@ -24,47 +19,6 @@ def read_llmjudge_qrel_file(qrel_in_file:Path) ->List[QrelEntry]:
             else:
                 raise RuntimeError(f"All lines in qrels file needs to contain four columns, or three for qrels to be completed. Offending line: \"{line}\"")
     return qrel_entries
-
-# def read_llmjudge_query_file(query_file:Path, max_queries:Optional[int]=None) -> Dict[str,str]:
-#     with open(query_file, 'rt') as file:
-#         query_dict = dict()
-#         for line in itertools.islice(file.readlines(), max_queries):
-#             splits = line.split("\t")
-#             if len(splits)>=2:
-#                 query_dict[splits[0].strip()]=splits[1].strip()
-#             else:
-#                 raise RuntimeError(f"each line in query file {query_file} must contain two tab-separated columns. Offending line: \"{line}\"")
-
-#     return query_dict
-
-
-
-# class LLMJudgeDocument(BaseModel):
-#     docid:str
-#     doc:str
-
-# def parseLLMJudgeDocument(line:str) -> LLMJudgeDocument:
-#     # Parse the JSON content of the line
-#     # print(line)
-#     return LLMJudgeDocument.parse_raw(line)
-
-# def loadLLMJudgeCorpus(file_path:Path, max_paragraphs:Optional[int]) -> List[LLMJudgeDocument]:
-#     '''Load LLMJudge document corpus'''
-
-#     result:List[LLMJudgeDocument] = list()
-#     try: 
-#         with open(file_path, 'rt', encoding='utf-8') as file:
-#             # return [parseQueryWithFullParagraphList(line) for line in file]
-#             for line in itertools.islice(file.readlines(), max_paragraphs):
-#                 result.append(parseLLMJudgeDocument(line))
-#     except  EOFError as e:
-#         print(f"Warning: File EOFError on {file_path}. Use truncated data....\nFull Error:\n{e} \n offending line: \n {line}")
-#     return result
-
-# def write_query_file(file_path:Path, queries:Dict[str,str])->None:
-#     with gzip.open(file_path, 'wt', encoding='utf-8') as file:
-#         json.dump(obj=queries,fp=file)
-
 
 def extract_relevance_label(rubric_paragraph:FullParagraphData, grade_filter:GradeFilter)-> int:
     exam_grades = rubric_paragraph.retrieve_exam_grade_any(grade_filter)
@@ -154,7 +108,6 @@ def main(cmdargs=None):
         rubric_paragraph = rubric_lookup.get((qrel_entry.query_id, qrel_entry.paragraph_id))
         if rubric_paragraph is None:
             raise RuntimeError(f"Cannot find paragraph for qrel entry {qrel_entry} in rubric_lookup (loaded from {args.grade_file})")
-        
 
         relevance_label = extract_relevance_label(rubric_paragraph, grade_filter=grade_filter)
 
