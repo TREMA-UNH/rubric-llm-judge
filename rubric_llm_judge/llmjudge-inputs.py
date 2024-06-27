@@ -1,5 +1,9 @@
+from collections import defaultdict
+import gzip
+import itertools
+import json
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 from pydantic import BaseModel
 
 from exam_pp import query_loader, data_model
@@ -57,6 +61,9 @@ def loadLLMJudgeCorpus(file_path:Path, max_paragraphs:Optional[int]) -> List[LLM
         print(f"Warning: File EOFError on {file_path}. Use truncated data....\nFull Error:\n{e} \n offending line: \n {line}")
     return result
 
+def write_query_file(file_path:Path, queries:Dict[str,str])->None:
+    with gzip.open(file_path, 'wt', encoding='utf-8') as file:
+        json.dump(obj=queries,fp=file)
 
 
 def main(cmdargs=None):
@@ -88,6 +95,8 @@ def main(cmdargs=None):
 
     parser.add_argument('--query-path', type=str, metavar='PATH', help='Path to read LLMJudge queries')
     parser.add_argument('--input-qrel-path', type=str, metavar='PATH', help='Path to read LLMJudge qrels (to be completed)')
+    parser.add_argument('--query-out', type=str, metavar='PATH', help='Path to write queries for RUBRIC/EXAM to')
+
     
 
     parser.add_argument('--max-queries', type=int, metavar='INT', default=None, help='limit the number of queries that will be processed (for debugging)')
@@ -103,14 +112,15 @@ def main(cmdargs=None):
 
     # Fetch the qrels file  ... and munge
     input_qrels = read_llmjudge_qrel_file(qrel_in_file=args.input_qrel_path)
-    query_ids = {q.query_id  for q in input_qrels}
+    qrel_query_ids = {q.query_id  for q in input_qrels}
     input_qrels_by_qid:Dict[str,List[QrelEntry]] = defaultdict(list)
     for qrel_entry in input_qrels:
         input_qrels_by_qid[qrel_entry.query_id].append(qrel_entry)
     
 
     # filter query set to the queries in the qrels file only
-    query_set = {qid:qstr  for qid,qstr in query_set.items() if qid in query_ids}
+    query_set = {qid:qstr  for qid,qstr in query_set.items() if qid in qrel_query_ids}
+    write_query_file(file_path=args.query_out, queries=query_set)
 
     # print(f"query_set = {query_set}")
 
