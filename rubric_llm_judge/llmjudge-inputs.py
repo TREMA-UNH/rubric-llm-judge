@@ -3,7 +3,7 @@ import gzip
 import itertools
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from pydantic import BaseModel
 
 from exam_pp import query_loader, data_model
@@ -72,7 +72,7 @@ def main(cmdargs=None):
     import argparse
 
     desc = f'''Convert LLMJudge data to inputs for EXAM/RUBRIC. \n
-              The RUBTIC input will to be a *JSONL.GZ file that follows this structure: \n
+              The RUBRIC input will to be a *JSONL.GZ file that follows this structure: \n
               \n  
                   [query_id, [FullParagraphData]] \n
               \n
@@ -140,14 +140,17 @@ def main(cmdargs=None):
     for query_id, query_str in query_set.items():
         paragraphs:List[FullParagraphData] = list()
         for qrels_entry in input_qrels_by_qid[query_id]:
-            judgment = Judgment(paragraphId= qrels_entry.paragraph_id, query=query_id, relevance=qrel_entry.grade, titleQuery=query_str)
+            judgments = []
+            if qrel_entry.grade != -99:
+                judgment = Judgment(paragraphId= qrels_entry.paragraph_id, query=query_id, relevance=qrel_entry.grade, titleQuery=query_str)
+                judgments = [judgment]
             para = corpus_by_para_id[qrels_entry.paragraph_id]
             if para is None:
                 raise RuntimeError(f"docid {qrels_entry.paragraph_id} not found in LLMJudge corpus")
             rubric_paragraph= FullParagraphData( paragraph_id= qrels_entry.paragraph_id
                                                , text= para.doc
                                                , paragraph=""
-                                               , paragraph_data=ParagraphData(judgments=[judgment], rankings=list())
+                                               , paragraph_data=ParagraphData(judgments=judgments, rankings=list())
                                                , exam_grades=None
                                                , grades=None
                                                )
