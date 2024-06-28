@@ -17,12 +17,16 @@ def read_llmjudge_qrel_file(qrel_in_file:Path) ->List[QrelEntry]:
         qrel_entries:List[QrelEntry] = list()
         for line in file.readlines():
             splits = line.split(" ")
+            qrel_entry=None
             if len(splits)>=4:
-                qrel_entries.append(QrelEntry(query_id=splits[0].strip(), paragraph_id=splits[2].strip(), grade=int(splits[3].strip())))
+                qrel_entry = QrelEntry(query_id=splits[0].strip(), paragraph_id=splits[2].strip(), grade=int(splits[3].strip()))
             elif len(splits)>=3: # we have a qrels file to complete.
-                qrel_entries.append(QrelEntry(query_id=splits[0].strip(), paragraph_id=splits[2].strip(), grade=-99))
+                qrel_entry = QrelEntry(query_id=splits[0].strip(), paragraph_id=splits[2].strip(), grade=-99)
             else:
                 raise RuntimeError(f"All lines in qrels file needs to contain four columns, or three for qrels to be completed. Offending line: \"{line}\"")
+            
+            qrel_entries.append(qrel_entry)
+            # print(f"{line}\n {qrel_entry}")
     return qrel_entries
 
 def read_llmjudge_query_file(query_file:Path, max_queries:Optional[int]=None) -> Dict[str,str]:
@@ -65,6 +69,35 @@ def write_query_file(file_path:Path, queries:Dict[str,str])->None:
     with gzip.open(file_path, 'wt', encoding='utf-8') as file:
         json.dump(obj=queries,fp=file)
 
+
+
+def convert_paragraphs(input_qrels_by_qid:Dict[str,List[QrelEntry]], query_set:Dict[str,str], corpus_by_para_id: Dict[str, LLMJudgeDocument])-> List[QueryWithFullParagraphList]:
+    rubric_data:List[QueryWithFullParagraphList] = list()
+
+    for query_id, query_str in query_set.items():
+        paragraphs:List[FullParagraphData] = list()
+        for qrel_entry in input_qrels_by_qid[query_id]:
+            judgments = []
+            if qrel_entry.grade != -99:
+                # print(f"{qrel_entry}")
+                judgment = Judgment(paragraphId= qrel_entry.paragraph_id, query=query_id, relevance=qrel_entry.grade, titleQuery=query_str)
+                judgments = [judgment]
+            para = corpus_by_para_id[qrel_entry.paragraph_id]
+            if para is None:
+                raise RuntimeError(f"docid {qrel_entry.paragraph_id} not found in LLMJudge corpus")
+            rubric_paragraph= FullParagraphData( paragraph_id= qrel_entry.paragraph_id
+                                               , text= para.doc
+                                               , paragraph=""
+                                               , paragraph_data=ParagraphData(judgments=judgments, rankings=list())
+                                               , exam_grades=None
+                                               , grades=None
+                                               )
+            paragraphs.append(rubric_paragraph)
+            # print(f"{rubric_paragraph}")
+
+
+        rubric_data.append(QueryWithFullParagraphList(queryId=query_id, paragraphs= paragraphs))
+    return rubric_data
 
 def main(cmdargs=None):
     """Convert LLMJudge data to inputs for EXAM/RUBRIC."""
@@ -116,6 +149,8 @@ def main(cmdargs=None):
     input_qrels_by_qid:Dict[str,List[QrelEntry]] = defaultdict(list)
     for qrel_entry in input_qrels:
         input_qrels_by_qid[qrel_entry.query_id].append(qrel_entry)
+        print(f"{qrel_entry}")
+
     
 
     # filter query set to the queries in the qrels file only
@@ -135,31 +170,8 @@ def main(cmdargs=None):
 
 
     # now emit the input files for RUBRIC/EXAM
-    rubric_data:List[QueryWithFullParagraphList] = list()
-
-    for query_id, query_str in query_set.items():
-        paragraphs:List[FullParagraphData] = list()
-        for qrels_entry in input_qrels_by_qid[query_id]:
-            judgments = []
-            if qrel_entry.grade != -99:
-                judgment = Judgment(paragraphId= qrels_entry.paragraph_id, query=query_id, relevance=qrel_entry.grade, titleQuery=query_str)
-                judgments = [judgment]
-            para = corpus_by_para_id[qrels_entry.paragraph_id]
-            if para is None:
-                raise RuntimeError(f"docid {qrels_entry.paragraph_id} not found in LLMJudge corpus")
-            rubric_paragraph= FullParagraphData( paragraph_id= qrels_entry.paragraph_id
-                                               , text= para.doc
-                                               , paragraph=""
-                                               , paragraph_data=ParagraphData(judgments=judgments, rankings=list())
-                                               , exam_grades=None
-                                               , grades=None
-                                               )
-            paragraphs.append(rubric_paragraph)
-            # print(f"{rubric_paragraph}")
-
-
-        rubric_data.append(QueryWithFullParagraphList(queryId=query_id, paragraphs= paragraphs))
-
+    rubric_data:List[QueryWithFullParagraphList] = convert_paragraphs(input_qrels_by_qid, query_set=query_set, corpus_by_para_id=corpus_by_para_id)
+ 
 
     writeQueryWithFullParagraphs(args.paragraph_file, queryWithFullParagraphList=rubric_data)
 
