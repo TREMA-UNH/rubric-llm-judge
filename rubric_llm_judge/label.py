@@ -27,6 +27,7 @@ from sklearn.model_selection import cross_val_score
 
 from exam_pp.data_model import *
 
+import pickle
 import numpy as np
 import abc
 from typing import List, Tuple, Iterator, Dict, NewType
@@ -137,18 +138,44 @@ def train(qrel: Path, judgements: Path) -> Classifier:
     return clf
 
 
-def test(clf: Classifier, test_pairs: Path, judgements: Path, out: TextIOBase) -> None:
+def predict(clf: Classifier,
+            test_pairs: Path,
+            judgements: Path,
+            out_qrel: Optional[TextIOBase],
+            out_exampp: Optional[Path]
+            ) -> None:
     queries: List[QueryWithFullParagraphList]
     queries = parseQueryWithFullParagraphs(judgements)
     queryDocMap, X, _y = build_features(queries, None)
     y = clf.predict(X)
 
-    for qid, did in read_test_pairs(test_pairs):
-        rel = y[queryDocMap[(qid,did)]]
-        print(f'{qid} 0 {did} {rel}', file=out)
+    if out_qrel:
+        for qid, did in read_test_pairs(test_pairs):
+            rel = y[queryDocMap[(qid,did)]]
+            print(f'{qid} 0 {did} {rel}', file=out_qrel)
+
+    if out_exampp:
+        for q in queries:
+            para: FullParagraphData
+            for para in q.paragraphs:
+                did = DocId(para.paragraph_id)
+                qid = QueryId(q.queryId)
+                rel = y[queryDocMap[(qid,did)]]
+                para.grades = [
+                    Grades(
+                        correctAnswered=rel > 3,
+                        answer='',
+                        llm='flan-t5-large',
+                        llm_options={},
+                        prompt_info={},
+                        self_ratings=rel,
+                        prompt_type='exampp-logistic-regression-labelling',
+                    )
+                ]
+        writeQueryWithFullParagraphs(out_exampp, queries)
 
 
-def main() -> None:
+def test() -> None:
     dataset_root = Path('/home/ben/rubric-llm-judge/LLMJudge/data')
     judgements_root = Path('/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/old')
     train_qrel = dataset_root / 'llm4eval_dev_qrel_2024.txt'
@@ -157,7 +184,39 @@ def main() -> None:
 
     test_qrel = dataset_root / 'llm4eval_test_qrel_2024.txt'
     test_judgements = judgements_root / 'questions-explain--questions-rate--llmjudge-passages_test.json.gz'
-    test(clf, test_qrel, test_judgements, open('out.qrel', 'w'))
+    predict(clf, test_qrel, test_judgements, open('out.qrel', 'w'))
+
+
+def main() -> None:
+    import argparse
+    from argparse import FileType
+    parser = argparse.ArgumentParser()
+    parser.set_defaults(mode=None)
+    subp = parser.add_subparsers()
+
+    p = subp.add_parser('train')
+    p.set_defaults(mode='train')
+    p.add_argument('--qrel', '-q', type=Path, required=True, help='Query relevance file')
+    p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
+    p.add_argument('--output', '-o', type=FileType('wb'), required=True, help='Output model file')
+
+    p = subp.add_parser('predict')
+    p.set_defaults(mode='predict')
+    p.add_argument('--model', '-m', type=FileType('rb'), required=True, help='Model file')
+    p.add_argument('--qrel', '-q', type=Path, required=True, help='Query/documents to predict in form of a partial .qrel file')
+    p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
+    p.add_argument('--output', '-o', type=Path, required=True, help='Output exampp judgements file')
+
+    args = parser.parse_args()
+
+    if args.mode == 'train':
+        clf = train(qrel=args.qrel, judgements=args.judgements)
+        pickle.dump(clf, args.output)
+    elif args.mode == 'predict':
+        clf = pickle.load(args.model)
+        predict(clf, args.qrel, args.judgements, None, args.output)
+    else:
+        parser.print_usage()
 
 
 if __name__ == '__main__':
