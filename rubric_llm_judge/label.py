@@ -203,8 +203,8 @@ def train(qrel: Path, judgements: Path, method: Method) -> Classifier:
     print('cross-validation: ', cross_val_score(clf, X, y, cv=5))
     print('score', clf.score(X, y))
     if method == Method.DecisionTree:
-        sklearn.tree.plot_tree(clf)
-        pl.savefig('tree.svg')
+        print('tree depth: ', clf.get_depth())
+        print('parameters: ', len(clf.get_params()))
 
     return clf
 
