@@ -31,6 +31,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from exam_pp.data_model import *
 
+import enum
 import pickle
 import numpy as np
 import abc
@@ -72,8 +73,7 @@ def rating_histogram(queries: List[QueryWithFullParagraphList]
         for para in q.paragraphs:
             for grades in para.exam_grades or []:
                 for s in grades.self_ratings or []:
-                    assert s.question_id
-                    result[QuestionId(s.question_id)][int(s.self_rating)] += 1
+                    result[QuestionId(s.get_id())][int(s.self_rating)] += 1
 
     return dict(result)
 
@@ -87,7 +87,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
     queryDocMap: Dict[Tuple[QueryId, DocId], int]
     queryDocMap = {}
 
-    X: List[List[float]]
+    X: List[np.ndarray]
     X = []
 
     y: List[float]
@@ -107,12 +107,21 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
             ratings: List[Tuple[QuestionId, int]]
             ratings = [
-                (QuestionId(s.question_id), s.self_rating)
+                (QuestionId(s.get_id()), s.self_rating)
                 for grades in para.exam_grades or []
                 for s in grades.self_ratings or []
-                if s.question_id is not None
+                #if s.get_id() is not None
                 ]
-            assert len(ratings) == 10
+
+            expected_ratings = 10
+            if len(ratings) != expected_ratings:
+                print(f'Query {qid} document {did} has {len(ratings)} ratings')
+
+            def pad_ratings(xs):
+                if len(xs) < expected_ratings:
+                    return [rating for qstid,rating in xs] + [0] * (expected_ratings - len(ratings))
+                else:
+                    return [rating for qstid,rating in xs[:expected_ratings]]
 
             feats = []
 
@@ -120,21 +129,21 @@ def build_features(queries: List[QueryWithFullParagraphList],
             if True:
                 feats += [
                     rating
-                    for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
+                    for rating in pad_ratings(sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True))
                     ]
 
             # One-hot ratings sorted by question informativeness
             if True:
                 feats += [
                     encode_rating(rating)
-                    for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
+                    for rating in pad_ratings(sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True))
                     ]
 
             # One-hot ratings sorted by rating
             if True:
                 feats += [
                     encode_rating(rating)
-                    for _qstid, rating in sorted(ratings, key=lambda q: q[1], reverse=True)
+                    for rating in pad_ratings(sorted(ratings, key=lambda q: q[1], reverse=True))
                     ]
 
             X.append(np.hstack(feats))
@@ -143,11 +152,18 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 rel = rels[(qid, did)]
                 y.append(rel)
 
-    np.savetxt('feats.csv', np.array(X))
-    return (queryDocMap, np.array(X), np.array(y) if rels is not None else None)
+    XX = np.array(X)
+    np.savetxt('feats.csv', XX)
+    return (queryDocMap, XX, np.array(y) if rels is not None else None)
 
 
-def train(qrel: Path, judgements: Path) -> Classifier:
+class Method(enum.Enum):
+    DecisionTree = enum.auto()
+    MLP = enum.auto()
+    LogReg = enum.auto()
+
+
+def train(qrel: Path, judgements: Path, method: Method) -> Classifier:
     rels = {
         (qid, did): rel
         for (qid, did, rel) in read_qrel(qrel)
@@ -159,19 +175,18 @@ def train(qrel: Path, judgements: Path) -> Classifier:
 
     _, X, y = build_features(queries, rels)
 
-    method = 'decision-tree'
-    if method == 'mlp':
+    if method == Method.MLP:
         clf = MLPClassifier(hidden_layer_sizes=(5, 5))
-    elif method == 'decision-tree':
+    elif method == Method.DecisionTree:
         clf = DecisionTreeClassifier()
-    elif method == 'logistic':
+    elif method == Method.LogReg:
         clf = LogisticRegressionCV(
                 cv=StratifiedKFold(5),
                 #class_weight='balanced',
                 penalty='l2',
                 dual=False,
-                scoring='accuracy',
-                #scoring=make_scorer(cohen_kappa_score),
+                #scoring='accuracy',
+                scoring=make_scorer(cohen_kappa_score),
                 solver='saga', multi_class='multinomial'
                 #solver='liblinear', multi_class='ovr'
                 )
@@ -247,6 +262,7 @@ def main() -> None:
     p.add_argument('--qrel', '-q', type=Path, required=True, help='Query relevance file')
     p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
     p.add_argument('--output', '-o', type=FileType('wb'), required=True, help='Output model file')
+    p.add_argument('--classifier', '-c', type=Method, default=Method.DecisionTree, help=f'Classification method (one of {", ".join(m.name for m in Method)})')
 
     p = subp.add_parser('predict')
     p.set_defaults(mode='predict')
@@ -259,7 +275,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mode == 'train':
-        clf = train(qrel=args.qrel, judgements=args.judgements)
+        clf = train(qrel=args.qrel, judgements=args.judgements, method=args.classifier)
         pickle.dump(clf, args.output)
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
