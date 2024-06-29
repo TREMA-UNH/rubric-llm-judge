@@ -24,7 +24,7 @@ features:
 import sklearn.tree
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegressionCV
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder
@@ -286,10 +286,32 @@ def main() -> None:
         queries: List[QueryWithFullParagraphList]
         queries = parseQueryWithFullParagraphs(args.judgements)
 
+        train_queries, test_queries = train_test_split(queries, test_size=0.5)
+
         clf = train(qrel=args.qrel,
-                    queries=queries,
+                    queries=train_queries,
                     method=args.classifier)
         pickle.dump(clf, args.output)
+
+        # Compute test error
+        test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
+                      for q in test_queries
+                      for para in q.paragraphs
+                      ]
+        truth = {(QueryId(q.queryId), DocId(para.paragraph_id)): s.self_rating
+                 for q in test_queries
+                 for para in q.paragraphs
+                 for grades in para.retrieve_exam_grade_any(SELF_GRADED)
+                 for s in grades.self_ratings or []
+                 }
+        print('Test set prediction')
+        predict(clf=clf,
+                test_pairs=test_pairs,
+                truth=truth,
+                judgements=args.judgements,
+                out_qrel=None,
+                out_exampp=None)
+
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
         qrel = list(read_qrel(args.qrel))
