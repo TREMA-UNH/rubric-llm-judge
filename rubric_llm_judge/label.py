@@ -21,13 +21,14 @@ features:
 
 """
 
+import sklearn.tree
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
+import matplotlib.pyplot as pl
 
 from exam_pp.data_model import *
 
@@ -178,7 +179,7 @@ def train(qrel: Path, judgements: Path, method: Method) -> Classifier:
     if method == Method.MLP:
         clf = MLPClassifier(hidden_layer_sizes=(5, 5))
     elif method == Method.DecisionTree:
-        clf = DecisionTreeClassifier()
+        clf = sklearn.tree.DecisionTreeClassifier()
     elif method == Method.LogReg:
         clf = LogisticRegressionCV(
                 cv=StratifiedKFold(5),
@@ -194,8 +195,13 @@ def train(qrel: Path, judgements: Path, method: Method) -> Classifier:
         assert False
 
     clf.fit(X, y)
+
     print('cross-validation: ', cross_val_score(clf, X, y, cv=5))
     print('score', clf.score(X, y))
+    if method == Method.DecisionTree:
+        sklearn.tree.plot_tree(clf)
+        pl.savefig('tree.svg')
+
     return clf
 
 
