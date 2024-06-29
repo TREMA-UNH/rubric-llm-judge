@@ -1,0 +1,31 @@
+# Description of Submissions, team TREMA-UNH for LLMJudge challenge
+
+
+## llm4eval_test_qrel_2024-heuristic_predicted.txt
+
+Self-rated answerability of generated questions (aka "question-RUBRIC") with 
+
+* prompt_class `QuestionSelfRatedUnanswerablePromptWithChoices`
+* min_anwers: 2
+* mapping: 
+```
+    if best_grade >= 5:
+        return 3
+    if best_grade >= 4:
+        return 1
+    if best_grade >= 1:
+        return 0
+    else:
+        return 0
+```
+Multiclass cohen's kappa on dev set: 0.167
+
+
+Grades: `questions-explain--questions-rate--llmjudge-passages_test.json.gz`
+
+
+# llm4eval_test_qrel_2024-nugget_heuristic_predicted.txt
+
+like `llm4eval_test_qrel_2024-heuristic_predicted.txt` but using nuggets with prompt `NuggetSelfRatedPrompt`
+
+Multiclass cohen's kappa on dev set: 0.095

@@ -1,10 +1,12 @@
 from collections import defaultdict
+import heapq
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 from exam_pp import data_model
 from exam_pp.exam_to_qrels import QrelEntry, write_qrel_file 
-from exam_pp.data_model import FullParagraphData, GradeFilter, parseQueryWithFullParagraphs
+from exam_pp.data_model import FullParagraphData, GradeFilter, parseQueryWithFullParagraphs, ExamGrades, Grades, SelfRating
+import sklearn
 
 def read_llmjudge_qrel_file(qrel_in_file:Path) ->List[QrelEntry]:
     '''Use to read qrel file'''
@@ -20,22 +22,82 @@ def read_llmjudge_qrel_file(qrel_in_file:Path) ->List[QrelEntry]:
                 raise RuntimeError(f"All lines in qrels file needs to contain four columns, or three for qrels to be completed. Offending line: \"{line}\"")
     return qrel_entries
 
-def extract_relevance_label(rubric_paragraph:FullParagraphData, grade_filter:GradeFilter)-> int:
+
+
+
+
+def k_best_rating(self_ratings:List[SelfRating], min_answers:int)->int:
+    # if exam_grade.self_ratings is None:
+    #     raise RuntimeError(f"exam_grades.self_ratings is None. Can't derive relevance label.")
+    ratings = (rate.self_rating for rate in self_ratings)
+    best_rating:int
+    if min_answers > 1:
+        best_rating = min( heapq.nlargest(min_answers, ratings ))
+    else:
+        best_rating = max(ratings)
+    return best_rating
+
+
+def predict_labels_from_exam_ratings(para:FullParagraphData, grade_filter:GradeFilter, min_answers:int=1)->int:
+    for exam_grade in para.retrieve_exam_grade_any(grade_filter=grade_filter): # there will be 1 or 0
+        if exam_grade.self_ratings is None:
+            raise RuntimeError(f"paragraphId: {para.paragraph_id}:  Exam grades have no self ratings!  {exam_grade}")
+
+        return k_best_rating(self_ratings=exam_grade.self_ratings, min_answers=min_answers)
+            
+    return 0
+
+def predict_labels_from_grade_rating(para:FullParagraphData, grade_filter:GradeFilter)->int:
+    if para.grades is None:
+        raise RuntimeError(f"paragraph \"{para.paragraph_id}\"does not have annotated `grades`. Data: {para}")
+
+    grade: Grades
+    for grade in para.retrieve_grade_any(grade_filter=grade_filter): # there will be 1 or 0
+        if grade.self_ratings is not None:
+            return grade.self_ratings
+    raise RuntimeError(f"paragraph \"{para.paragraph_id}\"does not have self_ratings in \"grades\". Data: {para}")
+
+
+def extract_heuristic_question_relevance_label(rubric_paragraph:FullParagraphData, grade_filter:GradeFilter, min_answers:int)-> int:
     exam_grades = rubric_paragraph.retrieve_exam_grade_any(grade_filter)
 
     if len(exam_grades)<1:
         raise RuntimeError(f"Cannot obtain exam_grades for grade filter {grade_filter} in rubric paragraph {rubric_paragraph}")
     
-    best_grade = max([r.self_rating for r in exam_grades[0].self_ratings_as_iterable()])
+    exam_grade=exam_grades[0]
+    # best_grade = max([r.self_rating for r in exam_grades[0].self_ratings_as_iterable()])
+    best_grade = k_best_rating(self_ratings=exam_grade.self_ratings, min_answers=min_answers)
+    if best_grade >= 5:
+        return 3
+    if best_grade >= 4:
+        return 1
+    if best_grade >= 1:
+        return 0
+    else:
+        return 0
+
+def extract_heuristic_nugget_relevance_label(rubric_paragraph:FullParagraphData, grade_filter:GradeFilter, min_answers:int)-> int:
+    exam_grades = rubric_paragraph.retrieve_exam_grade_any(grade_filter)
+
+    if len(exam_grades)<1:
+        raise RuntimeError(f"Cannot obtain exam_grades for grade filter {grade_filter} in rubric paragraph {rubric_paragraph}")
+    
+    exam_grade=exam_grades[0]
+    # best_grade = max([r.self_rating for r in exam_grades[0].self_ratings_as_iterable()])
+    best_grade = k_best_rating(self_ratings=exam_grade.self_ratings, min_answers=min_answers)
     if best_grade >= 5:
         return 3
     if best_grade >= 4:
         return 2
-    if best_grade >= 1:
+    if best_grade >= 3:
         return 1
     else:
         return 0
 
+
+def evaluate(train_labels:List[int], predict_labels:List[int]):
+    kappa = sklearn.metrics.cohen_kappa_score(train_labels, predict_labels)
+    print(f"multiclass kappa={kappa}")
 
 def main(cmdargs=None):
     """Convert EXAM/RUBRIC grades into LLMJudge relevance label predictions."""
@@ -62,6 +124,7 @@ def main(cmdargs=None):
 
     parser.add_argument('--input-qrel-path', type=str, metavar='PATH', help='Path to read LLMJudge qrels (to be completed)')
     parser.add_argument('--output-qrel-path', type=str, metavar='PATH', help='Path to write completed LLMJudge qrels to')
+    parser.add_argument('--min-answers', type=int, metavar='K', help='Considers the K\'th best self-rating. (For K=1, uses the best grade)')
 
     
 
@@ -102,6 +165,10 @@ def main(cmdargs=None):
     # now emit the input files for RUBRIC/EXAM
     completed_qrels:List[QrelEntry] = list()
 
+
+    train_labels = list()
+    predict_labels = list()
+
     for qrel_entry in input_qrels:
         qrel_entry.query_id
         qrel_entry.paragraph_id
@@ -109,7 +176,12 @@ def main(cmdargs=None):
         if rubric_paragraph is None:
             raise RuntimeError(f"Cannot find paragraph for qrel entry {qrel_entry} in rubric_lookup (loaded from {args.grade_file})")
 
-        relevance_label = extract_relevance_label(rubric_paragraph, grade_filter=grade_filter)
+ 
+        relevance_label = extract_heuristic_question_relevance_label(rubric_paragraph, grade_filter=grade_filter, min_answers=args.min_answers)
+
+        # keep stats for evaluation
+        train_labels.append(qrel_entry.grade)
+        predict_labels.append(relevance_label)
 
         completed_qrels.append(QrelEntry(query_id = qrel_entry.query_id, paragraph_id = qrel_entry.paragraph_id, grade = relevance_label))
 
@@ -117,6 +189,7 @@ def main(cmdargs=None):
 
     write_qrel_file(qrel_out_file=args.output_qrel_path, qrel_entries=completed_qrels)
 
+    evaluate(train_labels, predict_labels)
 
 
 if __name__ == "__main__":
