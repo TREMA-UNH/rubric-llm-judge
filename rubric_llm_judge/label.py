@@ -26,6 +26,8 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import OneHotEncoder
 
 from exam_pp.data_model import *
 
@@ -88,8 +90,13 @@ def build_features(queries: List[QueryWithFullParagraphList],
     X: List[List[float]]
     X = []
 
-    y: Optional[List[float]]
+    y: List[float]
     y = []
+
+    def encode_rating(i):
+        x = np.zeros((6,))
+        x[i] = 1
+        return x
 
     for q in queries:
         para: FullParagraphData
@@ -97,6 +104,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
             did = DocId(para.paragraph_id)
             qid = QueryId(q.queryId)
             queryDocMap[(qid, did)] = len(X)
+
             ratings: List[Tuple[QuestionId, int]]
             ratings = [
                 (QuestionId(s.question_id), s.self_rating)
@@ -104,17 +112,38 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 for s in grades.self_ratings or []
                 if s.question_id is not None
                 ]
-            feats = [
-                float(rating)
-                for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
-                ]
-            assert len(feats) == 10
-            X.append(feats)
+            assert len(ratings) == 10
+
+            feats = []
+
+            # Integer ratings sorted by question informativeness
+            if True:
+                feats += [
+                    rating
+                    for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
+                    ]
+
+            # One-hot ratings sorted by question informativeness
+            if True:
+                feats += [
+                    encode_rating(rating)
+                    for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
+                    ]
+
+            # One-hot ratings sorted by rating
+            if True:
+                feats += [
+                    encode_rating(rating)
+                    for _qstid, rating in sorted(ratings, key=lambda q: q[1], reverse=True)
+                    ]
+
+            X.append(np.hstack(feats))
 
             if rels is not None:
                 rel = rels[(qid, did)]
                 y.append(rel)
 
+    np.savetxt('feats.csv', np.array(X))
     return (queryDocMap, np.array(X), np.array(y) if rels is not None else None)
 
 
@@ -130,17 +159,28 @@ def train(qrel: Path, judgements: Path) -> Classifier:
 
     _, X, y = build_features(queries, rels)
 
-    clf = MLPClassifier(hidden_layer_sizes=(5, 2))
-    clf = LogisticRegressionCV(
-            cv=KFold(10),
-            class_weight='balanced',
-            penalty='l2',
-            dual=False,
-            scoring=make_scorer(cohen_kappa_score),
-            multi_class='multinomial')
+    method = 'decision-tree'
+    if method == 'mlp':
+        clf = MLPClassifier(hidden_layer_sizes=(5, 5))
+    elif method == 'decision-tree':
+        clf = DecisionTreeClassifier()
+    elif method == 'logistic':
+        clf = LogisticRegressionCV(
+                cv=StratifiedKFold(5),
+                #class_weight='balanced',
+                penalty='l2',
+                dual=False,
+                scoring='accuracy',
+                #scoring=make_scorer(cohen_kappa_score),
+                solver='saga', multi_class='multinomial'
+                #solver='liblinear', multi_class='ovr'
+                )
+    else:
+        assert False
+
     clf.fit(X, y)
-    print(cross_val_score(clf, X, y, cv=5))
-    print(clf.score(X, y))
+    print('cross-validation: ', cross_val_score(clf, X, y, cv=5))
+    print('score', clf.score(X, y))
     return clf
 
 
@@ -165,7 +205,7 @@ def predict(clf: Classifier,
     if truth is not None:
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
-        print(cohen_kappa_score(y_truth, y_test))
+        print('Kappa', cohen_kappa_score(y_truth, y_test))
         print(confusion_matrix(y_truth, y_test))
 
     if out_qrel is not None:
