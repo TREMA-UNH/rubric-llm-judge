@@ -22,9 +22,9 @@ features:
 """
 
 from sklearn.neural_network import MLPClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import cohen_kappa_score, confusion_matrix
+from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 
 from exam_pp.data_model import *
 
@@ -129,8 +129,13 @@ def train(qrel: Path, judgements: Path) -> Classifier:
 
     _, X, y = build_features(queries, rels)
 
-    #clf = MLPClassifier(hidden_layer_sizes=(5, 2))
-    clf = LogisticRegression()
+    clf = MLPClassifier(hidden_layer_sizes=(5, 2))
+    clf = LogisticRegressionCV(
+            class_weight='balanced',
+            penalty='l2',
+            dual=False,
+            scoring=make_scorer(cohen_kappa_score),
+            multi_class='multinomial')
     clf.fit(X, y)
     print(cross_val_score(clf, X, y, cv=5))
     print(clf.score(X, y))
