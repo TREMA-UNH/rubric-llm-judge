@@ -66,7 +66,7 @@ def loadLLMJudgeCorpus(file_path:Path, max_paragraphs:Optional[int]) -> List[LLM
     return result
 
 def write_query_file(file_path:Path, queries:Dict[str,str])->None:
-    with gzip.open(file_path, 'wt', encoding='utf-8') as file:
+    with open(file_path, 'wt', encoding='utf-8') as file:
         json.dump(obj=queries,fp=file)
 
 
