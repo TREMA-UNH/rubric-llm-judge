@@ -166,15 +166,12 @@ class Method(enum.Enum):
     LogReg = enum.auto()
 
 
-def train(qrel: Path, judgements: Path, method: Method) -> Classifier:
+def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method) -> Classifier:
     rels = {
         (qid, did): rel
         for (qid, did, rel) in read_qrel(qrel)
         if rel is not None
     }
-
-    queries: List[QueryWithFullParagraphList]
-    queries = parseQueryWithFullParagraphs(judgements)
 
     _, X, y = build_features(queries, rels)
 
@@ -217,7 +214,7 @@ def predict(clf: Classifier,
     """
     clf: classifier
     test_qrel: path to (partial) qrel containing test query/document pairs
-    truth: 
+    truth: optional mapping from query/document pairs to ground-truth label.
     """
 
     queries: List[QueryWithFullParagraphList]
@@ -251,7 +248,7 @@ def predict(clf: Classifier,
                         llm_options={},
                         prompt_info={},
                         self_ratings=rel,
-                        prompt_type='exampp-logistic-regression-labelling',
+                        prompt_type='exampp-llmjudge-labelling',
                     )
                 ]
 
@@ -283,7 +280,12 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mode == 'train':
-        clf = train(qrel=args.qrel, judgements=args.judgements, method=args.classifier)
+        queries: List[QueryWithFullParagraphList]
+        queries = parseQueryWithFullParagraphs(args.judgements)
+
+        clf = train(qrel=args.qrel,
+                    queries=queries,
+                    method=args.classifier)
         pickle.dump(clf, args.output)
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
