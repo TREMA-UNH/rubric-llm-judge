@@ -129,28 +129,27 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 else:
                     return [rating for qstid,rating in xs[:expected_ratings]]
 
+            feats: List[np.ndarray]
             feats = []
 
-            # Integer ratings sorted by question informativeness
-            if True:
+            def rating_feature(sort_key, encoding):
+                nonlocal feats
                 feats += [
-                    rating
-                    for rating in pad_ratings(sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True))
-                    ]
+                        encoding(rating)
+                        for rating in pad_ratings(sorted(ratings, key=sort_key, reverse=True))
+                        ]
+
+            # Integer ratings sorted by question informativeness
+            rating_feature(lambda q: hist[q[0]][5], lambda x: x)
 
             # One-hot ratings sorted by question informativeness
-            if True:
-                feats += [
-                    encode_rating(rating)
-                    for rating in pad_ratings(sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True))
-                    ]
+            #rating_feature(lambda q: hist[q[0]][5], encode_rating)
+
+            # Integer ratings sorted by rating
+            #rating_feature(lambda q: q[1], lambda x: x)
 
             # One-hot ratings sorted by rating
-            if True:
-                feats += [
-                    encode_rating(rating)
-                    for rating in pad_ratings(sorted(ratings, key=lambda q: q[1], reverse=True))
-                    ]
+            #rating_feature(lambda q: q[1], encode_rating)
 
             X.append(np.hstack(feats))
 
