@@ -65,6 +65,8 @@ def extract_heuristic_question_relevance_label(rubric_paragraph:FullParagraphDat
     
     exam_grade=exam_grades[0]
     # best_grade = max([r.self_rating for r in exam_grades[0].self_ratings_as_iterable()])
+    if exam_grade.self_ratings is None:
+        raise RuntimeError("exam_grade.self_ratings are None, despite the GradeFilter being set to use self_ratings")
     best_grade = k_best_rating(self_ratings=exam_grade.self_ratings, min_answers=min_answers)
     if best_grade >= 5:
         return 3
