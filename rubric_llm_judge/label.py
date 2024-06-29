@@ -25,6 +25,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
+from sklearn.model_selection import KFold, StratifiedKFold
 
 from exam_pp.data_model import *
 
@@ -131,6 +132,7 @@ def train(qrel: Path, judgements: Path) -> Classifier:
 
     clf = MLPClassifier(hidden_layer_sizes=(5, 2))
     clf = LogisticRegressionCV(
+            cv=KFold(10),
             class_weight='balanced',
             penalty='l2',
             dual=False,
