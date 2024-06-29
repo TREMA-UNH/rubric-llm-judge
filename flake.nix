@@ -14,7 +14,7 @@
         mkShell = target: (dspy-nix.lib.${system}.mkShell {
           inherit target;
           pythonOverrides = [ exampp.lib.${system}.pythonOverrides ];
-          packages = ps: [ ps.exampp ];
+          packages = ps: [ ps.exampp ps.scikit-learn ps.mypy ];
         });
 
       in {
