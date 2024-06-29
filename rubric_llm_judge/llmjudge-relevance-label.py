@@ -60,7 +60,6 @@ def predict_labels_from_grade_rating(para:FullParagraphData, grade_filter:GradeF
 
 def extract_heuristic_question_relevance_label(rubric_paragraph:FullParagraphData, grade_filter:GradeFilter, min_answers:int)-> int:
     exam_grades = rubric_paragraph.retrieve_exam_grade_any(grade_filter)
-
     if len(exam_grades)<1:
         raise RuntimeError(f"Cannot obtain exam_grades for grade filter {grade_filter} in rubric paragraph {rubric_paragraph}")
     
