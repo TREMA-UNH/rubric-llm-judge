@@ -24,6 +24,7 @@ features:
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import cohen_kappa_score
 
 from exam_pp.data_model import *
 
@@ -46,25 +47,21 @@ class Classifier(abc.ABC):
         pass
 
 
-def read_qrel(f: Path) -> Iterator[Tuple[QueryId, DocId, int]]:
+def read_qrel(f: Path) -> Iterator[Tuple[QueryId, DocId, Optional[int]]]:
     for l in f.open('r').readlines():
         parts = l.split()
         qid = QueryId(parts[0])
         did = DocId(parts[2])
-        rel = int(parts[3])
+        rel = int(parts[3]) if len(parts) == 4 else None
         yield (qid, did, rel)
-
-
-def read_test_pairs(f: Path) -> Iterator[Tuple[QueryId, DocId]]:
-    for l in f.open('r').readlines():
-        parts = l.split()
-        qid = QueryId(parts[0])
-        did = DocId(parts[2])
-        yield (qid, did)
 
 
 def rating_histogram(queries: List[QueryWithFullParagraphList]
                      ) -> Dict[QuestionId, Dict[int, int]]:
+    """
+    Histogram the number of times each question had the given self-rating.
+    result[question][rating] = count.
+    """
     result: Dict[QuestionId, Dict[int, int]]
     result = defaultdict(lambda: defaultdict(lambda: 0))
     for q in queries:
@@ -104,25 +101,27 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 (QuestionId(s.question_id), s.self_rating)
                 for grades in para.exam_grades or []
                 for s in grades.self_ratings or []
-                if s.question_id
+                if s.question_id is not None
                 ]
             feats = [
                 float(rating)
                 for _qstid, rating in sorted(ratings, key=lambda q: hist[q[0]][5], reverse=True)
                 ]
+            assert len(feats) == 10
             X.append(feats)
 
-            if rels:
+            if rels is not None:
                 rel = rels[(qid, did)]
                 y.append(rel)
 
-    return (queryDocMap, np.array(X), np.array(y) if rels else None)
+    return (queryDocMap, np.array(X), np.array(y) if rels is not None else None)
 
 
 def train(qrel: Path, judgements: Path) -> Classifier:
     rels = {
         (qid, did): rel
         for (qid, did, rel) in read_qrel(qrel)
+        if rel is not None
     }
 
     queries: List[QueryWithFullParagraphList]
@@ -139,22 +138,34 @@ def train(qrel: Path, judgements: Path) -> Classifier:
 
 
 def predict(clf: Classifier,
-            test_pairs: Path,
+            test_pairs: List[Tuple[QueryId, DocId]],
             judgements: Path,
+            truth: Optional[Dict[Tuple[QueryId, DocId], int]],
             out_qrel: Optional[TextIOBase],
             out_exampp: Optional[Path]
             ) -> None:
+    """
+    clf: classifier
+    test_qrel: path to (partial) qrel containing test query/document pairs
+    truth: 
+    """
+
     queries: List[QueryWithFullParagraphList]
     queries = parseQueryWithFullParagraphs(judgements)
     queryDocMap, X, _y = build_features(queries, None)
     y = clf.predict(X)
 
-    if out_qrel:
-        for qid, did in read_test_pairs(test_pairs):
+    if truth is not None:
+        y_truth = list(truth.values())
+        y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
+        print(cohen_kappa_score(y_truth, y_test))
+
+    if out_qrel is not None:
+        for qid, did in test_pairs:
             rel = y[queryDocMap[(qid,did)]]
             print(f'{qid} 0 {did} {rel}', file=out_qrel)
 
-    if out_exampp:
+    if out_exampp is not None:
         for q in queries:
             para: FullParagraphData
             for para in q.paragraphs:
@@ -172,19 +183,8 @@ def predict(clf: Classifier,
                         prompt_type='exampp-logistic-regression-labelling',
                     )
                 ]
+
         writeQueryWithFullParagraphs(out_exampp, queries)
-
-
-def test() -> None:
-    dataset_root = Path('/home/ben/rubric-llm-judge/LLMJudge/data')
-    judgements_root = Path('/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/old')
-    train_qrel = dataset_root / 'llm4eval_dev_qrel_2024.txt'
-    train_judgements = judgements_root / 'questions-explain--questions-rate--llmjudge-passages_dev.json.gz'
-    clf = train(qrel=train_qrel, judgements=train_judgements)
-
-    test_qrel = dataset_root / 'llm4eval_test_qrel_2024.txt'
-    test_judgements = judgements_root / 'questions-explain--questions-rate--llmjudge-passages_test.json.gz'
-    predict(clf, test_qrel, test_judgements, open('out.qrel', 'w'))
 
 
 def main() -> None:
@@ -206,6 +206,7 @@ def main() -> None:
     p.add_argument('--qrel', '-q', type=Path, required=True, help='Query/documents to predict in form of a partial .qrel file')
     p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
     p.add_argument('--output', '-o', type=Path, required=True, help='Output exampp judgements file')
+    p.add_argument('--output-qrel', type=FileType('wt'), required=True, help='Output qrel file')
 
     args = parser.parse_args()
 
@@ -214,7 +215,17 @@ def main() -> None:
         pickle.dump(clf, args.output)
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
-        predict(clf, args.qrel, args.judgements, None, args.output)
+        qrel = list(read_qrel(args.qrel))
+        test_pairs = [ (qid,did) for qid, did, _ in qrel ]
+        truth = {(qid,did): rel
+                 for qid, did, rel in qrel
+                 if rel is not None }
+        predict(clf=clf,
+                test_pairs=test_pairs,
+                truth=truth if truth != {} else None,
+                judgements=args.judgements,
+                out_qrel=args.output_qrel,
+                out_exampp=args.output)
     else:
         parser.print_usage()
 
