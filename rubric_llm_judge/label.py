@@ -267,7 +267,7 @@ def main() -> None:
     p.add_argument('--qrel', '-q', type=Path, required=True, help='Query relevance file')
     p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
     p.add_argument('--output', '-o', type=FileType('wb'), required=True, help='Output model file')
-    p.add_argument('--classifier', '-c', type=Method, default=Method.DecisionTree, help=f'Classification method (one of {", ".join(m.name for m in Method)})')
+    p.add_argument('--classifier', '-c', type=Method.__getitem__, default=Method.DecisionTree, help=f'Classification method (one of {", ".join(m.name for m in Method)})')
 
     p = subp.add_parser('predict')
     p.set_defaults(mode='predict')
