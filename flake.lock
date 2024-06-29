@@ -183,11 +183,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1719690734,
-        "narHash": "sha256-Vs24Slb3b4fVMA7lhpxQiFW4GIKrELHSz7KoxbZ1ac4=",
+        "lastModified": 1719693066,
+        "narHash": "sha256-UHlGtOXzvbIY7+LntXrobkOYqi+eKJ90gSIWK87lmNk=",
         "ref": "refs/heads/master",
-        "rev": "87c071d7633182501ef7d53c2378b583dbb16717",
-        "revCount": 239,
+        "rev": "8a51a960c69ca3180369480a3d014f9e3fc3a91d",
+        "revCount": 241,
         "type": "git",
         "url": "ssh://git@git.smart-cactus.org/ben/exampp.git"
       },
