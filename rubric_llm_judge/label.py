@@ -69,10 +69,12 @@ def rating_histogram(queries: List[QueryWithFullParagraphList]
     """
     result: Dict[QuestionId, Dict[int, int]]
     result = defaultdict(lambda: defaultdict(lambda: 0))
+    gfilter = GradeFilter.noFilter()
+    gfilter.is_self_rated = True
     for q in queries:
         para: FullParagraphData
         for para in q.paragraphs:
-            for grades in para.exam_grades or []:
+            for grades in para.retrieve_exam_grade_all(gfilter):
                 for s in grades.self_ratings or []:
                     result[QuestionId(s.get_id())][int(s.self_rating)] += 1
 
@@ -99,6 +101,9 @@ def build_features(queries: List[QueryWithFullParagraphList],
         x[i] = 1
         return x
 
+    gfilter = GradeFilter.noFilter()
+    gfilter.is_self_rated = True
+
     for q in queries:
         para: FullParagraphData
         for para in q.paragraphs:
@@ -109,7 +114,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
             ratings: List[Tuple[QuestionId, int]]
             ratings = [
                 (QuestionId(s.get_id()), s.self_rating)
-                for grades in para.exam_grades or []
+                for grades in para.retrieve_exam_grade_all(gfilter)
                 for s in grades.self_ratings or []
                 #if s.get_id() is not None
                 ]
