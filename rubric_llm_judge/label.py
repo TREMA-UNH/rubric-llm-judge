@@ -141,13 +141,13 @@ def build_features(queries: List[QueryWithFullParagraphList],
             rating_feature(lambda q: hist[q[0]][5], lambda x: x)
 
             # One-hot ratings sorted by question informativeness
-            #rating_feature(lambda q: hist[q[0]][5], encode_rating)
+            rating_feature(lambda q: hist[q[0]][5], encode_rating)
 
             # Integer ratings sorted by rating
-            #rating_feature(lambda q: q[1], lambda x: x)
+            rating_feature(lambda q: q[1], lambda x: x)
 
             # One-hot ratings sorted by rating
-            #rating_feature(lambda q: q[1], encode_rating)
+            rating_feature(lambda q: q[1], encode_rating)
 
             X.append(np.hstack(feats))
 
