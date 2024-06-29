@@ -242,13 +242,16 @@ def predict(clf: Classifier,
                 rel = y[queryDocMap[(qid,did)]]
                 para.grades = [
                     Grades(
-                        correctAnswered=rel > 3,
+                        correctAnswered=rel >= 1,
                         answer='',
                         llm='flan-t5-large',
                         llm_options={},
-                        prompt_info={},
                         self_ratings=rel,
-                        prompt_type='exampp-llmjudge-labelling',
+                        prompt_type='DirectGrading',
+                        prompt_info={
+                            'prompt_class': 'exampp-llmjudge-labelling',
+                            'is_self_rated': True,
+                        },
                     )
                 ]
 
