@@ -24,7 +24,7 @@ features:
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import cohen_kappa_score, confusion_matrix
 
 from exam_pp.data_model import *
 
@@ -159,6 +159,7 @@ def predict(clf: Classifier,
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
         print(cohen_kappa_score(y_truth, y_test))
+        print(confusion_matrix(y_truth, y_test))
 
     if out_qrel is not None:
         for qid, did in test_pairs:
