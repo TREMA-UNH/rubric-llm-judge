@@ -24,9 +24,9 @@ features:
 import sklearn.tree
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import ShuffleSplit, cross_val_score, train_test_split
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold, StratifiedKFold, BaseCrossValidator
 from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as pl
 
@@ -36,7 +36,7 @@ import enum
 import pickle
 import numpy as np
 import abc
-from typing import List, Tuple, Iterator, Dict, NewType
+from typing import List, Tuple, Iterator, Dict, NewType, Callable, TypeVar
 from io import TextIOBase
 from pathlib import Path
 
@@ -97,6 +97,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
     hist: Dict[QuestionId, Dict[int, int]]
     hist = rating_histogram(queries)
 
+    # associate (query,doc) to row in the feature matrix X
     queryDocMap: Dict[Tuple[QueryId, DocId], int]
     queryDocMap = {}
 
@@ -106,7 +107,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
     y: List[float]
     y = []
 
-    def one_hot_rating(i):
+    def one_hot_rating(i:int) -> np.ndarray:
         x = np.zeros((6,))
         x[i] = 1
         return x
@@ -134,29 +135,30 @@ def build_features(queries: List[QueryWithFullParagraphList],
             feats: List[np.ndarray]
             feats = []
 
-            def rating_feature(sort_key, encoding):
+            def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
+                               encoding: Callable[[int], np.ndarray]):
                 """
                 Introduce a set of features based on the document's ratings
                 represented as a vector using the given function, sorting the
                 ratings using the given sort key.
                 """
                 nonlocal feats, ratings
-                xs = sorted(ratings, key=sort_key, reverse=True)
-                if len(xs) < expected_ratings:
-                    xs = [rating for qstid,rating in xs] + [0] * (expected_ratings - len(ratings))
+                sorted_ratings = sorted(ratings, key=sort_key, reverse=True)
+                if len(sorted_ratings) < expected_ratings:
+                    padded_ratings = [rating for qstid,rating in sorted_ratings] + [0] * (expected_ratings - len(ratings))
                 else:
-                    xs = [rating for qstid,rating in xs[:expected_ratings]]
+                    padded_ratings = [rating for qstid,rating in sorted_ratings[:expected_ratings]]
 
-                feats += [ encoding(rating) for rating in xs ]
+                feats += [ encoding(rating) for rating in padded_ratings ]
 
             # Integer ratings sorted by question informativeness
-            rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=lambda x: x)
+            # rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=lambda x: x)
 
             # One-hot ratings sorted by question informativeness
-            rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=one_hot_rating)
+            # rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=one_hot_rating)
 
             # Integer ratings sorted by rating
-            rating_feature(sort_key=lambda q: q[1], encoding=lambda x: x)
+            # rating_feature(sort_key=lambda q: q[1], encoding=lambda x: np.array([x]))
 
             # One-hot ratings sorted by rating
             rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
@@ -195,37 +197,45 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
     _, X, y = build_features(queries, rels)
 
     if method == Method.MLP:
-        clf = MLPClassifier(hidden_layer_sizes=(5, 5))
+        clf = MLPClassifier(hidden_layer_sizes=(5,1),
+                             activation='tanh', 
+                             learning_rate='constant',
+                               solver='adam'
+                               )
     elif method == Method.DecisionTree:
         clf = sklearn.tree.DecisionTreeClassifier()
     elif method == Method.LogRegCV:
         clf = LogisticRegressionCV(
-                cv=StratifiedKFold(5),
+                cv=StratifiedKFold(5, shuffle=False),
+                # cv=KFold(n_splits=2, shuffle=False),
                 class_weight='balanced',
                 max_iter=10000,
                 penalty='l2',
                 dual=False,
+                fit_intercept=True,
                 #scoring='accuracy',
-                #scoring=make_scorer(cohen_kappa_score),
+                scoring=make_scorer(cohen_kappa_score),
                 #solver='saga', multi_class='multinomial'
-                #solver='liblinear', multi_class='ovr'
+                # solver='liblinear', multi_class='ovr'
                 )
     elif method == Method.LogReg:
         clf = LogisticRegression(
                 #class_weight='balanced',
+                class_weight="balanced",
                 max_iter=10000,
                 penalty='l2',
                 dual=False,
                 #solver='saga', multi_class='multinomial'
-                #solver='liblinear', multi_class='ovr'
+                # solver='liblinear',  multi_class='ovr'
+                fit_intercept=True
                 )
     else:
         assert False
 
     clf.fit(X, y)
 
-    print('cross-validation: ', cross_val_score(clf, X, y, cv=5))
-    print('score', clf.score(X, y))
+    print('cross-validation: ', cross_val_score(clf, X, y, cv=10))
+    print('training score', clf.score(X, y)) # training loss achieved
     if method == Method.DecisionTree:
         print('tree depth: ', clf.get_depth())
         print('parameters: ', len(clf.get_params()))
@@ -234,6 +244,8 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
     elif method == Method.LogReg:
         print('parameters: ', clf.intercept_, clf.coef_)
         pass
+    elif method == Method.LogRegCV:
+        print('parameters: ', clf.Cs_, clf.C_)
 
     return clf
 

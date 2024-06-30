@@ -48,3 +48,4 @@ qrel_balance() {
 }
 
 $@
+# call  `./run-label.sh $function`
