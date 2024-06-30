@@ -138,8 +138,8 @@ def build_features(queries: List[QueryWithFullParagraphList],
                                encoding: Callable[[int], np.ndarray]):
                 """
                 Introduce a set of features based on the document's ratings
-                represented as a vector using the given function, sorting the
-                ratings using the given sort key.
+                represented them as a vector using the given function and
+                sorting the ratings using the given sort key.
                 """
                 nonlocal feats, ratings
                 sorted_ratings = sorted(ratings, key=sort_key, reverse=True)
