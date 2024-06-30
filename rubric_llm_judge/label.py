@@ -442,7 +442,7 @@ def main() -> None:
 
     if args.mode == 'train':
         if args.restarts != 1 and args.classifier not in SUPPORTS_RESTARTS:
-            logging.warn(f"{args.classifier} doesn't support restarts")
+            logging.warning(f"{args.classifier} doesn't support restarts")
             args.restarts = 1
 
         queries: List[QueryWithFullParagraphList]
