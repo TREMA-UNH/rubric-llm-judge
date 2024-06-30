@@ -313,6 +313,7 @@ def predict(clf: Classifier,
     y = clf.predict(X)
 
     if truth is not None:
+        truth = { (qid, did): truth[(qid,did)] for qid,did in test_pairs }
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
         print('Kappa', cohen_kappa_score(y_truth, y_test))
