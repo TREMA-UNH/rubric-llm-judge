@@ -129,19 +129,19 @@ def build_features(queries: List[QueryWithFullParagraphList],
             feats: List[np.ndarray]
             feats = []
 
-            PROMPT_CLASSES = [
-                    'NuggetSelfRatedPrompt',
-                    'QuestionSelfRatedUnanswerablePromptWithChoices',
+            PROMPT_CLASSES = {
+                    'NuggetSelfRatedPrompt': 'nugget',
+                    'QuestionSelfRatedUnanswerablePromptWithChoices': 'question',
                     # Direct rating prompts
-                    'FagB',
-                    'FagB_few',
-                    'HELM',
-                    'Sun',
-                    'Sun_few',
-                    'Thomas',
-                    ]
+                    'FagB': 'binary',
+                    'FagB_few': 'binary',
+                    'HELM': 'binary',
+                    'Sun': 'binary',
+                    'Sun_few': 'binary',
+                    'Thomas': 'direct',
+                    }
 
-            for pclass in PROMPT_CLASSES:
+            for pclass, prompt_type in PROMPT_CLASSES.items():
                 gfilt = GradeFilter.noFilter()
                 gfilt.prompt_class = pclass
 
@@ -152,7 +152,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
                     for s in grades.self_ratings or []
                     ]
 
-                if ratings == 0:
+                if len(ratings) == 0:
                     continue
 
                 expected_ratings = 10
@@ -177,37 +177,42 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
                 FULL_FEATURES = True
 
-                if FULL_FEATURES: 
-                    expected_ratings=10
-                    # Integer ratings sorted by mean question rating
-                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
+                if prompt_type in {'question', 'nugget'}:
+                    if FULL_FEATURES: 
+                        expected_ratings=10
+                        # Integer ratings sorted by mean question rating
+                        rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
 
-                    # One-hot ratings sorted by mean question rating
-                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
+                        # One-hot ratings sorted by mean question rating
+                        rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
 
-                    # Integer ratings sorted by question informativeness
-                    #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
+                        # Integer ratings sorted by question informativeness
+                        #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
 
-                    # One-hot ratings sorted by question informativeness
-                    #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
+                        # One-hot ratings sorted by question informativeness
+                        #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
 
-                    # Integer ratings sorted by rating
-                    rating_feature(sort_key=lambda q: q[1], encoding=identity)
+                        # Integer ratings sorted by rating
+                        rating_feature(sort_key=lambda q: q[1], encoding=identity)
 
-                    # One-hot ratings sorted by rating
-                    rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+                        # One-hot ratings sorted by rating
+                        rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
 
-                    # Number of questions answered with N or better
-                    feats += [ sum(1 for qstid,r in ratings if r >= n) for n in range(5) ]
+                        # Number of questions answered with N or better
+                        feats += [ sum(1 for qstid,r in ratings if r >= n) for n in range(5) ]
 
-                    # One-hot maximum rating
-                    #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+                        # One-hot maximum rating
+                        #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
 
-                    # Integer maximum rating
-                    #feats += [ [max(rating for qstid, rating in ratings)] ]
+                        # Integer maximum rating
+                        #feats += [ [max(rating for qstid, rating in ratings)] ]
+                    else:
+                        expected_ratings=2
+                        rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
+                elif prompt_type == 'direct':
+                    feats += [ np.array([ratings[0][1]]) ]
                 else:
-                    expected_ratings=2
-                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
+                    assert False
 
             X.append(np.hstack(feats))
 
