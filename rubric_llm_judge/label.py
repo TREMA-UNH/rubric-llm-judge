@@ -384,13 +384,12 @@ def main() -> None:
         pickle.dump(clf, args.output)
 
         # Compute validation error
-        qrel = list(read_qrel(args.qrel))
         test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
                       for q in test_queries
                       for para in q.paragraphs
                       ]
         truth = {(qid,did): rel
-                 for qid, did, rel in qrel
+                 for qid, did, rel in read_qrel(args.qrel)
                  if rel is not None }
 
         print('Validation set prediction')
