@@ -330,21 +330,24 @@ def predict(clf: Pipeline,
             truth: Optional[Dict[Tuple[QueryId, DocId], int]],
             out_qrel: Optional[TextIOBase],
             out_exampp: Optional[Path]
-            ) -> None:
+            ) -> Optional[float]:
     """
     clf: classifier
     test_qrel: path to (partial) qrel containing test query/document pairs
     truth: optional mapping from query/document pairs to ground-truth label.
+    Returns validation kappa if `truth` is not None.
     """
 
     queryDocMap, X, _y = build_features(queries, None)
     y = clf.predict(X)
 
+    validate_kappa = None
     if truth is not None:
         truth = { (qid, did): truth[(qid,did)] for qid,did in test_pairs }
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
-        print('Kappa', cohen_kappa_score(y_truth, y_test))
+        validate_kappa = cohen_kappa_score(y_truth, y_test)
+        print('Kappa', validate_kappa)
         print(confusion_matrix(y_truth, y_test))
 
     if out_qrel is not None:
@@ -376,6 +379,8 @@ def predict(clf: Pipeline,
 
         writeQueryWithFullParagraphs(out_exampp, queries)
 
+    return validate_kappa
+
 
 def main() -> None:
     import argparse
@@ -386,6 +391,7 @@ def main() -> None:
 
     p = subp.add_parser('train')
     p.set_defaults(mode='train')
+    p.add_argument('--restarts', '-r', type=int, default=1, help='Training restarts')
     p.add_argument('--qrel', '-q', type=Path, required=True, help='Query relevance file')
     p.add_argument('--judgements', '-j', type=Path, required=True, help='exampp judgements file')
     p.add_argument('--output', '-o', type=FileType('wb'), required=True, help='Output model file')
@@ -407,27 +413,34 @@ def main() -> None:
 
         train_queries, test_queries = train_test_split(queries, test_size=0.5)
 
-        clf = train(qrel=args.qrel,
-                    queries=train_queries,
-                    method=args.classifier)
-        pickle.dump(clf, args.output)
+        restarts = []
+        for i in range(args.restarts):
+            clf = train(qrel=args.qrel,
+                        queries=train_queries,
+                        method=args.classifier)
 
-        # Compute validation error
-        test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
-                      for q in test_queries
-                      for para in q.paragraphs
-                      ]
-        truth = {(qid,did): rel
-                 for qid, did, rel in read_qrel(args.qrel)
-                 if rel is not None }
+            # Compute validation error
+            test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
+                          for q in test_queries
+                          for para in q.paragraphs
+                          ]
+            truth = {(qid,did): rel
+                     for qid, did, rel in read_qrel(args.qrel)
+                     if rel is not None }
 
-        print('Validation set prediction')
-        predict(clf=clf,
-                test_pairs=test_pairs,
-                truth=truth,
-                queries=queries,
-                out_qrel=None,
-                out_exampp=None)
+            print('Validation set prediction')
+            kappa = predict(clf=clf,
+                            test_pairs=test_pairs,
+                            truth=truth,
+                            queries=queries,
+                            out_qrel=None,
+                            out_exampp=None)
+
+            restarts.append((kappa, clf))
+
+        best_kappa, best_clf = max(restarts)
+        print(f'Best model: kappa={best_kappa}')
+        pickle.dump(best_clf, args.output)
 
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
