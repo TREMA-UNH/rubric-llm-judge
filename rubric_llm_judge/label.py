@@ -21,6 +21,9 @@ features:
 
 """
 
+from sklearn.calibration import LinearSVC
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.svm import SVC
 import sklearn.tree
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -169,6 +172,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
             # Integer maximum rating
             #feats += [ [max(rating for qstid, rating in ratings)] ]
 
+
             X.append(np.hstack(feats))
 
             if rels is not None:
@@ -176,6 +180,8 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 y.append(rel)
 
     XX = np.array(X)
+    # todo: z-score normalization
+
     np.savetxt('feats.csv', XX)
     return (queryDocMap, XX, np.array(y) if rels is not None else None)
 
@@ -185,6 +191,10 @@ class Method(enum.Enum):
     MLP = enum.auto()
     LogRegCV = enum.auto()
     LogReg = enum.auto()
+    SVM = enum.auto()
+    LinearSVM = enum.auto()
+    RandomForest = enum.auto()
+    HistGradientBoostedClassifier = enum.auto()
 
 
 def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method) -> Classifier:
@@ -229,6 +239,30 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
                 # solver='liblinear',  multi_class='ovr'
                 fit_intercept=True
                 )
+    elif method == Method.SVM:
+        # implement grid search: https://scikit-learn.org/stable/auto_examples/model_selection/plot_nested_cross_validation_iris.html#sphx-glr-auto-examples-model-selection-plot-nested-cross-validation-iris-py
+        clf = SVC(
+                decision_function_shape='ovo',
+                class_weight="balanced"
+                )
+    elif method == Method.LinearSVM:
+        clf = LinearSVC(
+                class_weight="balanced",
+                dual=False
+              )
+    elif method == Method.RandomForest:
+        clf = RandomForestClassifier(
+                class_weight="balanced",
+                max_depth=2,
+                n_estimators=5,
+                min_samples_split=10
+              )
+    elif method == Method.HistGradientBoostedClassifier:
+        clf = HistGradientBoostingClassifier(
+                class_weight="balanced",
+                max_depth=2,
+                scoring=make_scorer(cohen_kappa_score)
+              )
     else:
         assert False
 
@@ -246,6 +280,18 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
         pass
     elif method == Method.LogRegCV:
         print('parameters: ', clf.Cs_, clf.C_)
+
+    # todo custom loss function optimizer
+        #     def my_custom_loss_func(y_true,y_pred):
+        #    diff3=max((abs(y_true-y_pred))*y_true)
+        #    return diff3
+
+        # score=make_scorer(my_custom_loss_func,greater_ is_better=False)
+        # clf=RandomForestClassifier()
+        # mnn= GridSearchCV(clf,score)
+        # knn = mnn.fit(feam,labm)  
+
+
 
     return clf
 
