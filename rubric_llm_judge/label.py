@@ -321,8 +321,8 @@ def train(qrel: Path,
         clf = ExtraTreesClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=3,
-                n_estimators=5,
+                max_depth=4,
+                n_estimators=10,
                 min_samples_split=10
               )
     elif method == Method.HistGradientBoostedClassifier:
