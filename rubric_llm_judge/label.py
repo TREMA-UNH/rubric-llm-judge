@@ -22,7 +22,7 @@ features:
 """
 
 from sklearn.calibration import LinearSVC
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier
 from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 import sklearn.tree
@@ -229,11 +229,13 @@ class Method(enum.Enum):
     SVM = enum.auto()
     LinearSVM = enum.auto()
     RandomForest = enum.auto()
+    ExtraTrees = enum.auto()
     HistGradientBoostedClassifier = enum.auto()
 
 
 SUPPORTS_RESTARTS: Set[Method]
 SUPPORTS_RESTARTS = {
+        Method.ExtraTrees,
         Method.DecisionTree,
         Method.RandomForest,
         Method.MLP
@@ -311,7 +313,15 @@ def train(qrel: Path,
         clf = RandomForestClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=2,
+                max_depth=5,
+                n_estimators=5,
+                min_samples_split=10
+              )
+    elif method == Method.ExtraTrees:
+        clf = ExtraTreesClassifier(
+                random_state=random_state,
+                class_weight="balanced",
+                max_depth=5,
                 n_estimators=5,
                 min_samples_split=10
               )
