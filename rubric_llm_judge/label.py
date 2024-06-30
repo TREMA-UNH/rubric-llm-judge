@@ -298,7 +298,7 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
 
 def predict(clf: Classifier,
             test_pairs: List[Tuple[QueryId, DocId]],
-            judgements: Path,
+            queries: List[QueryWithFullParagraphList],
             truth: Optional[Dict[Tuple[QueryId, DocId], int]],
             out_qrel: Optional[TextIOBase],
             out_exampp: Optional[Path]
@@ -309,8 +309,6 @@ def predict(clf: Classifier,
     truth: optional mapping from query/document pairs to ground-truth label.
     """
 
-    queries: List[QueryWithFullParagraphList]
-    queries = parseQueryWithFullParagraphs(judgements)
     queryDocMap, X, _y = build_features(queries, None)
     y = clf.predict(X)
 
@@ -399,13 +397,14 @@ def main() -> None:
         predict(clf=clf,
                 test_pairs=test_pairs,
                 truth=truth,
-                judgements=args.judgements,
+                queries=queries,
                 out_qrel=None,
                 out_exampp=None)
 
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
         qrel = list(read_qrel(args.qrel))
+        queries = parseQueryWithFullParagraphs(args.judgements)
         test_pairs = [ (qid,did) for qid, did, _ in qrel ]
         truth = {(qid,did): rel
                  for qid, did, rel in qrel
@@ -413,7 +412,7 @@ def main() -> None:
         predict(clf=clf,
                 test_pairs=test_pairs,
                 truth=truth if truth != {} else None,
-                judgements=args.judgements,
+                queries=queries,
                 out_qrel=args.output_qrel,
                 out_exampp=args.output)
     else:
