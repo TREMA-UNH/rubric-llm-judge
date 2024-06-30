@@ -174,7 +174,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
                 identity = lambda x: np.array([x])
 
-                FULL_FEATURES = False
+                FULL_FEATURES = True
 
                 if FULL_FEATURES: 
                     expected_ratings=10
