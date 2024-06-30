@@ -5,9 +5,6 @@ set -e -x -o pipefail
 if [ -z "$CLASSIFIER" ]; then CLASSIFIER=LinearSVM; fi
 if [ -z "$RESTARTS" ]; then RESTARTS=1; fi
 
-name="out/$CLASSIFIER"
-mkdir -p $name
-
 dataset="/home/ben/rubric-llm-judge/LLMJudge/data"
 judgement_dir="/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge"
 
@@ -29,6 +26,12 @@ CLASSIFIERS=(
     HistGradientBoostedClassifier
 )
 
+model_dir() {
+    local dir="out/$CLASSIFIER"
+    mkdir -p "$dir"
+    printf "$dir"
+}
+
 train() {
     python -m rubric_llm_judge.label \
         train \
@@ -36,27 +39,27 @@ train() {
         --judgements $judgements \
         --classifier $CLASSIFIER \
         --restarts $RESTARTS \
-        --output $name/model
+        --output $(model_dir)/model
 }
 
 predict() {
     python -m rubric_llm_judge.label \
         predict \
-        --model $name/model \
+        --model $(model_dir)/model \
         --qrel $dataset/llm4eval_dev_qrel_2024.txt \
         --judgements $judgements \
-        --output $name/dev.jsonl.gz \
-        --output-qrel $name/dev.qrel
+        --output $(model_dir)/dev.jsonl.gz \
+        --output-qrel $(model_dir)/dev.qrel
 }
 
 test() {
     python -m rubric_llm_judge.label \
         predict \
-        -m $name/model \
+        -m $(model_dir)/model \
         --qrel $dataset/llm4eval_test_qrel_2024.txt \
         -j $test_judgements \
-        -o $name/test.jsonl.gz \
-        --output-qrel $name/test.qrel
+        -o $(model_dir)/test.jsonl.gz \
+        --output-qrel $(model_dir)/test.qrel
 }
 
 exampp_balance() {
