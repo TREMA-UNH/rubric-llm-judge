@@ -333,15 +333,15 @@ def train(qrel: Path,
         clf = ExtraTreesClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=4,
-                n_estimators=10,
-                min_samples_split=10
+                max_depth=6,
+                n_estimators=60,
+                min_samples_split=20
               )
     elif method == Method.HistGradientBoostedClassifier:
         clf = HistGradientBoostingClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=2,
+                max_depth=4,
                 scoring=make_scorer(cohen_kappa_score)
               )
     else:
