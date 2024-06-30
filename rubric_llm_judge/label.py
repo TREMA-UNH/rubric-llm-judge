@@ -231,6 +231,7 @@ class Method(enum.Enum):
     RandomForest = enum.auto()
     HistGradientBoostedClassifier = enum.auto()
 
+
 SUPPORTS_RESTARTS: Set[Method]
 SUPPORTS_RESTARTS = {
         Method.DecisionTree,
@@ -380,7 +381,6 @@ def predict(clf: Pipeline,
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
         validate_kappa = cohen_kappa_score(y_truth, y_test)
-        logging.info(f'Kappa={validate_kappa}')
         logging.info(confusion_matrix(y_truth, y_test))
 
     if out_qrel is not None:
@@ -479,6 +479,7 @@ def main() -> None:
                             queries=queries,
                             out_qrel=None,
                             out_exampp=None)
+            logging.info(f'Train kappa={train_kappa}')
 
             # Compute validation error
             logging.info('Validation set prediction')
@@ -488,7 +489,9 @@ def main() -> None:
                             queries=queries,
                             out_qrel=None,
                             out_exampp=None)
+            logging.info(f'Validation kappa={validation_kappa}')
 
+            print(f'{args.classifier} {i} {train_kappa} {validation_kappa}')
             restarts.append({
                 'train_kappa': train_kappa,
                 'validation_kappa': validation_kappa,
@@ -507,12 +510,13 @@ def main() -> None:
         truth = {(qid,did): rel
                  for qid, did, rel in qrel
                  if rel is not None }
-        predict(clf=clf,
+        kappa = predict(clf=clf,
                 test_pairs=test_pairs,
                 truth=truth if truth != {} else None,
                 queries=queries,
                 out_qrel=args.output_qrel,
                 out_exampp=args.output)
+        logging.info(f'Kappa={kappa}')
     else:
         parser.print_usage()
 
