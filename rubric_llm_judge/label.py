@@ -166,6 +166,9 @@ def build_features(queries: List[QueryWithFullParagraphList],
             # One-hot ratings sorted by rating
             rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
 
+            # Number of questions answered
+            #feats += [ [sum(1 for qstid,r in ratings if r > 3)] ]
+
             # One-hot maximum rating
             #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
 
