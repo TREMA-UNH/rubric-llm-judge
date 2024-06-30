@@ -8,7 +8,7 @@ if [ -z "$RESTARTS" ]; then RESTARTS=1; fi
 dataset="/home/ben/rubric-llm-judge/LLMJudge/data"
 judgement_dir="/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge"
 
-judgements="$judgement_dir/questions-explain--questions-rate--llmjudge-passages_dev.json.gz"
+#judgements="$judgement_dir/questions-explain--questions-rate--llmjudge-passages_dev.json.gz"
 #judgements="$judgement_dir/nuggets-rate--all-llmjudge-passages_dev.json.gz"
 #judgements="$judgement_dir/Thomas-Sun_few-HELM-FagB_few-Sun-FagB-llmjudge-passages_dev.json.gz"
 judgements="$judgement_dir/all-llmjudge-passages_dev.json.gz"
@@ -24,6 +24,7 @@ CLASSIFIERS=(
     LinearSVM
     SVM
     HistGradientBoostedClassifier
+    ExtraTrees
 )
 
 model_dir() {
