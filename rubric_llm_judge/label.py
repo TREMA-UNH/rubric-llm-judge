@@ -154,7 +154,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 if ratings == 0:
                     continue
 
-                expected_ratings = 2
+                expected_ratings = 10
 
                 def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
                                    encoding: Callable[[int], np.ndarray]):
@@ -174,33 +174,39 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
                 identity = lambda x: np.array([x])
 
-                # Integer ratings sorted by mean question rating
-                rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
+                FULL_FEATURES = False
 
-                # One-hot ratings sorted by mean question rating
-                rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
+                if FULL_FEATURES: 
+                    expected_ratings=10
+                    # Integer ratings sorted by mean question rating
+                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
 
-                # Integer ratings sorted by question informativeness
-                rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
+                    # One-hot ratings sorted by mean question rating
+                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
 
-                # One-hot ratings sorted by question informativeness
-                rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
+                    # Integer ratings sorted by question informativeness
+                    #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
 
-                # Integer ratings sorted by rating
-                # rating_feature(sort_key=lambda q: q[1], encoding=identity)
+                    # One-hot ratings sorted by question informativeness
+                    #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
 
-                # One-hot ratings sorted by rating
-                rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+                    # Integer ratings sorted by rating
+                    rating_feature(sort_key=lambda q: q[1], encoding=identity)
 
-                # Number of questions answered
-                #feats += [ [sum(1 for qstid,r in ratings if r > 3)] ]
+                    # One-hot ratings sorted by rating
+                    rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
 
-                # One-hot maximum rating
-                #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+                    # Number of questions answered with N or better
+                    feats += [ sum(1 for qstid,r in ratings if r >= n) for n in range(5) ]
 
-                # Integer maximum rating
-                #feats += [ [max(rating for qstid, rating in ratings)] ]
+                    # One-hot maximum rating
+                    #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
 
+                    # Integer maximum rating
+                    #feats += [ [max(rating for qstid, rating in ratings)] ]
+                else:
+                    expected_ratings=2
+                    rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
 
             X.append(np.hstack(feats))
 
