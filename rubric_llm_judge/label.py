@@ -24,13 +24,14 @@ features:
 from sklearn.calibration import LinearSVC
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
 import sklearn.tree
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.model_selection import ShuffleSplit, cross_val_score, train_test_split
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold, BaseCrossValidator
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import matplotlib.pyplot as pl
 
 from exam_pp.data_model import *
@@ -50,12 +51,6 @@ DocId = NewType("DocId", str)
 
 SELF_GRADED = GradeFilter.noFilter()
 SELF_GRADED.is_self_rated = True
-
-
-class Classifier(abc.ABC):
-    @abc.abstractmethod
-    def predict(x, y) -> np.ndarray:
-        pass
 
 
 def read_qrel(f: Path) -> Iterator[Tuple[QueryId, DocId, Optional[int]]]:
@@ -191,10 +186,10 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 y.append(rel)
 
     XX = np.array(X)
-    # todo: z-score normalization
+    yy = np.array(y)
 
     np.savetxt('feats.csv', XX)
-    return (queryDocMap, XX, np.array(y) if rels is not None else None)
+    return (queryDocMap, XX, yy if rels is not None else None)
 
 
 class Method(enum.Enum):
@@ -208,7 +203,7 @@ class Method(enum.Enum):
     HistGradientBoostedClassifier = enum.auto()
 
 
-def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method) -> Classifier:
+def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method) -> Pipeline:
     rels = {
         (qid, did): rel
         for (qid, did, rel) in read_qrel(qrel)
@@ -216,6 +211,9 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
     }
 
     _, X, y = build_features(queries, rels)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X, y)
 
     if method == Method.MLP:
         clf = MLPClassifier(hidden_layer_sizes=(5,1),
@@ -300,12 +298,15 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
         # mnn= GridSearchCV(clf,score)
         # knn = mnn.fit(feam,labm)  
 
+    pipeline = Pipeline(steps=[
+        ("scale", scaler),
+        ("classify", clf),
+        ])
+
+    return pipeline
 
 
-    return clf
-
-
-def predict(clf: Classifier,
+def predict(clf: Pipeline,
             test_pairs: List[Tuple[QueryId, DocId]],
             queries: List[QueryWithFullParagraphList],
             truth: Optional[Dict[Tuple[QueryId, DocId], int]],
