@@ -100,6 +100,10 @@ def build_features(queries: List[QueryWithFullParagraphList],
     hist: Dict[QuestionId, Dict[int, int]]
     hist = rating_histogram(queries)
 
+    mean_rating: Dict[QuestionId, float]
+    mean_rating = {qid: sum(n*r for r,n in ratings.items()) / sum(ratings.values())
+                   for qid, ratings in hist.items() }
+
     # associate (query,doc) to row in the feature matrix X
     queryDocMap: Dict[Tuple[QueryId, DocId], int]
     queryDocMap = {}
@@ -149,6 +153,12 @@ def build_features(queries: List[QueryWithFullParagraphList],
                     padded_ratings = [rating for qstid,rating in sorted_ratings[:expected_ratings]]
 
                 feats += [ encoding(rating) for rating in padded_ratings ]
+
+            # Integer ratings sorted by mean question rating
+            rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=lambda x: x)
+
+            # One-hot ratings sorted by mean question rating
+            rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
 
             # Integer ratings sorted by question informativeness
             rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=lambda x: x)
