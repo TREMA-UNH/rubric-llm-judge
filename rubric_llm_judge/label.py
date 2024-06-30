@@ -114,10 +114,13 @@ def build_features(queries: List[QueryWithFullParagraphList],
     y: List[float]
     y = []
 
-    def one_hot_rating(i:int) -> np.ndarray:
-        x = np.zeros((6,))
-        x[i] = 1
-        return x
+    def one_hot_rating(n:int) -> Callable[[int], np.ndarray]:
+        def f(i: int) -> np.ndarray:
+            x = np.zeros((n,))
+            x[i] = 1
+            return x
+
+        return f
 
     for q in queries:
         para: FullParagraphData
@@ -130,18 +133,18 @@ def build_features(queries: List[QueryWithFullParagraphList],
             feats = []
 
             PROMPT_CLASSES = {
-                    'NuggetSelfRatedPrompt': 'nugget',
-                    'QuestionSelfRatedUnanswerablePromptWithChoices': 'question',
+                    'NuggetSelfRatedPrompt': {0,1,2,3,4,5},
+                    'QuestionSelfRatedUnanswerablePromptWithChoices': {0,1,2,3,4,5},
                     # Direct rating prompts
-                    'FagB': 'binary',
-                    'FagB_few': 'binary',
-                    'HELM': 'binary',
-                    'Sun': 'binary',
-                    'Sun_few': 'binary',
-                    'Thomas': 'direct',
+                    'FagB': {0,1},
+                    'FagB_few': {0,1},
+                    'HELM': {0,1},
+                    'Sun': {0,1},
+                    'Sun_few': {0,1},
+                    'Thomas': {0,1,2},
                     }
 
-            for pclass, prompt_type in PROMPT_CLASSES.items():
+            for pclass, valid_range in PROMPT_CLASSES.items():
                 gfilt = GradeFilter.noFilter()
                 gfilt.prompt_class = pclass
 
@@ -157,6 +160,9 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
                 expected_ratings = 10
 
+                def clamp(x: int) -> int:
+                    return 0 if x not in valid_range else x
+
                 def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
                                    encoding: Callable[[int], np.ndarray]):
                     """
@@ -167,9 +173,9 @@ def build_features(queries: List[QueryWithFullParagraphList],
                     nonlocal feats, ratings
                     sorted_ratings = sorted(ratings, key=sort_key, reverse=True)
                     if len(sorted_ratings) < expected_ratings:
-                        padded_ratings = [rating for qstid,rating in sorted_ratings] + [0] * (expected_ratings - len(ratings))
+                        padded_ratings = [clamp(rating) for qstid,rating in sorted_ratings] + [0] * (expected_ratings - len(ratings))
                     else:
-                        padded_ratings = [rating for qstid,rating in sorted_ratings[:expected_ratings]]
+                        padded_ratings = [clamp(rating) for qstid,rating in sorted_ratings[:expected_ratings]]
 
                     feats += [ encoding(rating) for rating in padded_ratings ]
 
@@ -177,42 +183,42 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
                 FULL_FEATURES = True
 
-                if prompt_type in {'question', 'nugget'}:
+                if len(valid_range) <= 3:
+                    r = clamp(ratings[0][1])
+                    feats += [ np.array([r]) ]
+                    feats += [ one_hot_rating(len(valid_range))(r) ]
+                else:
                     if FULL_FEATURES: 
                         expected_ratings=10
                         # Integer ratings sorted by mean question rating
                         rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
 
                         # One-hot ratings sorted by mean question rating
-                        rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
+                        rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating(6))
 
                         # Integer ratings sorted by question informativeness
                         #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
 
                         # One-hot ratings sorted by question informativeness
-                        #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
+                        #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating(6))
 
                         # Integer ratings sorted by rating
                         rating_feature(sort_key=lambda q: q[1], encoding=identity)
 
                         # One-hot ratings sorted by rating
-                        rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+                        rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating(6))
 
                         # Number of questions answered with N or better
                         feats += [ sum(1 for qstid,r in ratings if r >= n) for n in range(5) ]
 
                         # One-hot maximum rating
-                        #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+                        #feats += [ one_hot_rating(6)(max(rating for qstid, rating in ratings)) ]
 
                         # Integer maximum rating
                         #feats += [ [max(rating for qstid, rating in ratings)] ]
                     else:
                         expected_ratings=2
                         rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
-                elif prompt_type == 'direct':
-                    feats += [ np.array([ratings[0][1]]) ]
-                else:
-                    assert False
 
             X.append(np.hstack(feats))
 
