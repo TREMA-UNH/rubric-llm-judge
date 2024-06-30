@@ -252,11 +252,16 @@ def train(qrel: Path,
         clf = MLPClassifier(
                 random_state=random_state,
                 hidden_layer_sizes=(5,1),
+                max_iter=1000,
                 activation='tanh',
                 learning_rate='constant',
                 solver='adam')
     elif method == Method.DecisionTree:
-        clf = sklearn.tree.DecisionTreeClassifier(random_state=random_state)
+        clf = sklearn.tree.DecisionTreeClassifier(
+                max_features='log2',
+                max_depth=3,
+                min_samples_leaf=20,
+                random_state=random_state)
     elif method == Method.LogRegCV:
         clf = LogisticRegressionCV(
                 random_state=random_state,
@@ -268,7 +273,7 @@ def train(qrel: Path,
                 dual=False,
                 fit_intercept=True,
                 scoring=make_scorer(cohen_kappa_score),
-                solver='sag', multi_class='multinomial'
+                solver='saga', multi_class='multinomial'
                 )
     elif method == Method.LogReg:
         clf = LogisticRegression(
@@ -319,8 +324,8 @@ def train(qrel: Path,
     if method == Method.DecisionTree:
         logging.info(f'tree depth: {clf.get_depth()}')
         logging.info(f'parameters: {len(clf.get_params())}')
-        sklearn.tree.plot_tree(clf)
-        pl.savefig('tree.svg')
+        #sklearn.tree.plot_tree(clf)
+        #pl.savefig('tree.svg')
     elif method == Method.LogReg:
         logging.info(f'parameters: {clf.intercept_}, {clf.coef_}')
         pass
