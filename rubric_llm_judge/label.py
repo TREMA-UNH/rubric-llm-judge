@@ -470,7 +470,9 @@ def main() -> None:
         queries: List[QueryWithFullParagraphList]
         queries = parseQueryWithFullParagraphs(args.judgements)
 
-        train_queries, test_queries = train_test_split(queries, test_size=0.5)
+        #train_queries, test_queries = train_test_split(queries, test_size=0.5, random_state=2)
+        train_queries = queries[:len(queries)//2]
+        test_queries = queries[len(queries)//2:]
 
         test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
                       for q in test_queries
