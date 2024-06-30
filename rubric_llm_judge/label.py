@@ -151,10 +151,10 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 feats += [ encoding(rating) for rating in padded_ratings ]
 
             # Integer ratings sorted by question informativeness
-            # rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=lambda x: x)
+            rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=lambda x: x)
 
             # One-hot ratings sorted by question informativeness
-            # rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=one_hot_rating)
+            rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
 
             # Integer ratings sorted by rating
             # rating_feature(sort_key=lambda q: q[1], encoding=lambda x: np.array([x]))
