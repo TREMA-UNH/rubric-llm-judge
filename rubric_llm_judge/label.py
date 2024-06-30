@@ -132,6 +132,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
             PROMPT_CLASSES = [
                     'NuggetSelfRatedPrompt',
                     'QuestionSelfRatedUnanswerablePromptWithChoices',
+                    # Direct rating prompts
                     'FagB',
                     'FagB_few',
                     'HELM',
@@ -268,9 +269,9 @@ def train(qrel: Path,
                 solver='adam')
     elif method == Method.DecisionTree:
         clf = sklearn.tree.DecisionTreeClassifier(
-                max_features='log2',
-                max_depth=3,
-                min_samples_leaf=20,
+                #max_features='log2',
+                max_depth=4,
+                min_samples_leaf=10,
                 random_state=random_state)
     elif method == Method.LogRegCV:
         clf = LogisticRegressionCV(
