@@ -313,15 +313,15 @@ def train(qrel: Path,
         clf = RandomForestClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=5,
-                n_estimators=5,
+                max_depth=3,
+                n_estimators=10,
                 min_samples_split=10
               )
     elif method == Method.ExtraTrees:
         clf = ExtraTreesClassifier(
                 random_state=random_state,
                 class_weight="balanced",
-                max_depth=5,
+                max_depth=3,
                 n_estimators=5,
                 min_samples_split=10
               )
