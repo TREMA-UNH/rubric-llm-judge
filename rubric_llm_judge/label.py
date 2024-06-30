@@ -207,10 +207,9 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
 
     if method == Method.MLP:
         clf = MLPClassifier(hidden_layer_sizes=(5,1),
-                             activation='tanh', 
-                             learning_rate='constant',
-                               solver='adam'
-                               )
+                            activation='tanh',
+                            learning_rate='constant',
+                            solver='adam')
     elif method == Method.DecisionTree:
         clf = sklearn.tree.DecisionTreeClassifier()
     elif method == Method.LogRegCV:
