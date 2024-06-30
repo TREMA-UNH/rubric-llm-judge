@@ -23,7 +23,7 @@ features:
 
 import sklearn.tree
 from sklearn.neural_network import MLPClassifier
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer, cohen_kappa_score, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold
@@ -85,6 +85,15 @@ def rating_histogram(queries: List[QueryWithFullParagraphList]
 def build_features(queries: List[QueryWithFullParagraphList],
                    rels: Optional[Dict[Tuple[QueryId, DocId], int]]
                    ) -> Tuple[Dict[Tuple[QueryId, DocId], int], np.ndarray, Optional[np.ndarray]]:
+    """
+    Result: (queryDocMap, feature tensor, training vector)
+    Build a feature tensor for the given set of queries. Also produces a
+    dictionary mapping query/document pairs to their respective row indexes in
+    the feature tensor.
+
+    Finally, if ground-truth relevances are given with `rels`, the result will
+    also include a training vector.
+    """
     hist: Dict[QuestionId, Dict[int, int]]
     hist = rating_histogram(queries)
 
@@ -97,7 +106,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
     y: List[float]
     y = []
 
-    def encode_rating(i):
+    def one_hot_rating(i):
         x = np.zeros((6,))
         x[i] = 1
         return x
@@ -117,37 +126,46 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 #if s.get_id() is not None
                 ]
 
-            expected_ratings = 10
+            expected_ratings = 2
             if len(ratings) != expected_ratings:
-                print(f'Query {qid} document {did} has {len(ratings)} ratings')
-
-            def pad_ratings(xs):
-                if len(xs) < expected_ratings:
-                    return [rating for qstid,rating in xs] + [0] * (expected_ratings - len(ratings))
-                else:
-                    return [rating for qstid,rating in xs[:expected_ratings]]
+                #print(f'Query {qid} document {did} has {len(ratings)} ratings')
+                pass
 
             feats: List[np.ndarray]
             feats = []
 
             def rating_feature(sort_key, encoding):
-                nonlocal feats
-                feats += [
-                        encoding(rating)
-                        for rating in pad_ratings(sorted(ratings, key=sort_key, reverse=True))
-                        ]
+                """
+                Introduce a set of features based on the document's ratings
+                represented as a vector using the given function, sorting the
+                ratings using the given sort key.
+                """
+                nonlocal feats, ratings
+                xs = sorted(ratings, key=sort_key, reverse=True)
+                if len(xs) < expected_ratings:
+                    xs = [rating for qstid,rating in xs] + [0] * (expected_ratings - len(ratings))
+                else:
+                    xs = [rating for qstid,rating in xs[:expected_ratings]]
+
+                feats += [ encoding(rating) for rating in xs ]
 
             # Integer ratings sorted by question informativeness
-            rating_feature(lambda q: hist[q[0]][5], lambda x: x)
+            rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=lambda x: x)
 
             # One-hot ratings sorted by question informativeness
-            rating_feature(lambda q: hist[q[0]][5], encode_rating)
+            rating_feature(sort_key=lambda q: hist[q[0]][5], encoding=one_hot_rating)
 
             # Integer ratings sorted by rating
-            rating_feature(lambda q: q[1], lambda x: x)
+            rating_feature(sort_key=lambda q: q[1], encoding=lambda x: x)
 
             # One-hot ratings sorted by rating
-            rating_feature(lambda q: q[1], encode_rating)
+            rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+
+            # One-hot maximum rating
+            #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+
+            # Integer maximum rating
+            #feats += [ [max(rating for qstid, rating in ratings)] ]
 
             X.append(np.hstack(feats))
 
@@ -163,6 +181,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
 class Method(enum.Enum):
     DecisionTree = enum.auto()
     MLP = enum.auto()
+    LogRegCV = enum.auto()
     LogReg = enum.auto()
 
 
@@ -179,15 +198,25 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
         clf = MLPClassifier(hidden_layer_sizes=(5, 5))
     elif method == Method.DecisionTree:
         clf = sklearn.tree.DecisionTreeClassifier()
-    elif method == Method.LogReg:
+    elif method == Method.LogRegCV:
         clf = LogisticRegressionCV(
                 cv=StratifiedKFold(5),
-                #class_weight='balanced',
+                class_weight='balanced',
+                max_iter=10000,
                 penalty='l2',
                 dual=False,
                 #scoring='accuracy',
-                scoring=make_scorer(cohen_kappa_score),
-                solver='saga', multi_class='multinomial'
+                #scoring=make_scorer(cohen_kappa_score),
+                #solver='saga', multi_class='multinomial'
+                #solver='liblinear', multi_class='ovr'
+                )
+    elif method == Method.LogReg:
+        clf = LogisticRegression(
+                #class_weight='balanced',
+                max_iter=10000,
+                penalty='l2',
+                dual=False,
+                #solver='saga', multi_class='multinomial'
                 #solver='liblinear', multi_class='ovr'
                 )
     else:
@@ -200,6 +229,11 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
     if method == Method.DecisionTree:
         print('tree depth: ', clf.get_depth())
         print('parameters: ', len(clf.get_params()))
+        sklearn.tree.plot_tree(clf)
+        pl.savefig('tree.svg')
+    elif method == Method.LogReg:
+        print('parameters: ', clf.intercept_, clf.coef_)
+        pass
 
     return clf
 
@@ -304,7 +338,8 @@ def main() -> None:
                  for grades in para.retrieve_exam_grade_any(SELF_GRADED)
                  for s in grades.self_ratings or []
                  }
-        print('Test set prediction')
+
+        print('Validation set prediction')
         predict(clf=clf,
                 test_pairs=test_pairs,
                 truth=truth,
