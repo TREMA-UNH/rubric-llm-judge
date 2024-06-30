@@ -36,6 +36,7 @@ import matplotlib.pyplot as pl
 
 from exam_pp.data_model import *
 
+import logging
 import enum
 import pickle
 import numpy as np
@@ -45,9 +46,13 @@ from io import TextIOBase
 from pathlib import Path
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 QuestionId = NewType("QuestionId", str)
 QueryId = NewType("QueryId", str)
 DocId = NewType("DocId", str)
+
 
 SELF_GRADED = GradeFilter.noFilter()
 SELF_GRADED.is_self_rated = True
@@ -205,7 +210,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
     XX = np.array(X)
     yy = np.array(y)
-
+    logging.info(f'feature shape: {XX.shape}')
     np.savetxt('feats.csv', XX)
     return (queryDocMap, XX, yy if rels is not None else None)
 
@@ -303,18 +308,18 @@ def train(qrel: Path,
 
     clf.fit(X, y)
 
-    print('cross-validation: ', cross_val_score(clf, X, y, cv=10))
-    print('training score', clf.score(X, y)) # training loss achieved
+    #logging.info(f'cross-validation: {cross_val_score(clf, X, y, cv=10)}')
+    logging.info(f'training score: {clf.score(X, y)}') # training loss achieved
     if method == Method.DecisionTree:
-        print('tree depth: ', clf.get_depth())
-        print('parameters: ', len(clf.get_params()))
+        logging.info(f'tree depth: {clf.get_depth()}')
+        logging.info(f'parameters: {len(clf.get_params())}')
         sklearn.tree.plot_tree(clf)
         pl.savefig('tree.svg')
     elif method == Method.LogReg:
-        print('parameters: ', clf.intercept_, clf.coef_)
+        logging.info(f'parameters: {clf.intercept_}, {clf.coef_}')
         pass
     elif method == Method.LogRegCV:
-        print('parameters: ', clf.Cs_, clf.C_)
+        logging.info(f'parameters: {clf.Cs_}, {clf.C_}')
 
     # todo custom loss function optimizer
         #     def my_custom_loss_func(y_true,y_pred):
@@ -357,8 +362,8 @@ def predict(clf: Pipeline,
         y_truth = list(truth.values())
         y_test = [ y[queryDocMap[(qid, did)]] for qid,did in truth.keys() ]
         validate_kappa = cohen_kappa_score(y_truth, y_test)
-        print('Kappa', validate_kappa)
-        print(confusion_matrix(y_truth, y_test))
+        logging.info(f'Kappa={validate_kappa}')
+        logging.info(confusion_matrix(y_truth, y_test))
 
     if out_qrel is not None:
         for qid, did in test_pairs:
@@ -441,7 +446,7 @@ def main() -> None:
                      for qid, did, rel in read_qrel(args.qrel)
                      if rel is not None }
 
-            print('Validation set prediction')
+            logging.info('Validation set prediction')
             kappa = predict(clf=clf,
                             test_pairs=test_pairs,
                             truth=truth,
@@ -451,8 +456,8 @@ def main() -> None:
 
             restarts.append((kappa, clf))
 
-        best_kappa, best_clf = max(restarts)
-        print(f'Best model: kappa={best_kappa}')
+        best_kappa, best_clf = max(restarts, key=lambda x: x[0])
+        logging.info(f'Best model: kappa={best_kappa}')
         pickle.dump(best_clf, args.output)
 
     elif args.mode == 'predict':
