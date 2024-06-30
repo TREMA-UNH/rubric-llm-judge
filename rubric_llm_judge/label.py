@@ -41,7 +41,7 @@ import enum
 import pickle
 import numpy as np
 import abc
-from typing import List, Tuple, Iterator, Dict, NewType, Callable, TypeVar
+from typing import List, Tuple, Iterator, Dict, NewType, Callable, TypeVar, Set
 from io import TextIOBase
 from pathlib import Path
 
@@ -230,6 +230,13 @@ class Method(enum.Enum):
     LinearSVM = enum.auto()
     RandomForest = enum.auto()
     HistGradientBoostedClassifier = enum.auto()
+
+SUPPORTS_RESTARTS: Set[Method]
+SUPPORTS_RESTARTS = {
+        Method.DecisionTree,
+        Method.RandomForest,
+        Method.MLP
+        }
 
 
 def train(qrel: Path,
@@ -434,42 +441,63 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mode == 'train':
+        if args.restarts != 1 and args.classifier not in SUPPORTS_RESTARTS:
+            logging.warn(f"{args.classifier} doesn't support restarts")
+            args.restarts = 1
+
         queries: List[QueryWithFullParagraphList]
         queries = parseQueryWithFullParagraphs(args.judgements)
 
         train_queries, test_queries = train_test_split(queries, test_size=0.5)
 
+        test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
+                      for q in test_queries
+                      for para in q.paragraphs
+                      ]
+        train_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
+                      for q in train_queries
+                      for para in q.paragraphs
+                      ]
+        truth = {(qid,did): rel
+                 for qid, did, rel in read_qrel(args.qrel)
+                 if rel is not None }
+
         restarts = []
         random_state = np.random.RandomState()
         for i in range(args.restarts):
-            np.random.seed(i)
+            #np.random.seed(i)
             clf = train(qrel=args.qrel,
                         queries=train_queries,
                         method=args.classifier,
                         random_state=random_state)
 
-            # Compute validation error
-            test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
-                          for q in test_queries
-                          for para in q.paragraphs
-                          ]
-            truth = {(qid,did): rel
-                     for qid, did, rel in read_qrel(args.qrel)
-                     if rel is not None }
+            # Compute train error
+            logging.info('Train set prediction')
+            train_kappa = predict(clf=clf,
+                            test_pairs=train_pairs,
+                            truth=truth,
+                            queries=queries,
+                            out_qrel=None,
+                            out_exampp=None)
 
+            # Compute validation error
             logging.info('Validation set prediction')
-            kappa = predict(clf=clf,
+            validation_kappa = predict(clf=clf,
                             test_pairs=test_pairs,
                             truth=truth,
                             queries=queries,
                             out_qrel=None,
                             out_exampp=None)
 
-            restarts.append((kappa, clf))
+            restarts.append({
+                'train_kappa': train_kappa,
+                'validation_kappa': validation_kappa,
+                'model': clf
+                })
 
-        best_kappa, best_clf = max(restarts, key=lambda x: x[0])
-        logging.info(f'Best model: kappa={best_kappa}')
-        pickle.dump(best_clf, args.output)
+        best = max(restarts, key=lambda x: x['validation_kappa'])
+        logging.info(f'Best model: train kappa={best["train_kappa"]}, validation kappa={best["validation_kappa"]}')
+        pickle.dump(best['model'], args.output)
 
     elif args.mode == 'predict':
         clf = pickle.load(args.model)
