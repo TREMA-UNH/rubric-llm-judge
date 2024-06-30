@@ -121,62 +121,80 @@ def build_features(queries: List[QueryWithFullParagraphList],
             qid = QueryId(q.queryId)
             queryDocMap[(qid, did)] = len(X)
 
-            ratings: List[Tuple[QuestionId, int]]
-            ratings = [
-                (QuestionId(s.get_id()), s.self_rating)
-                for grades in para.retrieve_exam_grade_all(SELF_GRADED)
-                for s in grades.self_ratings or []
-                ]
-
             feats: List[np.ndarray]
             feats = []
 
-            expected_ratings = 2
+            PROMPT_CLASSES = [
+                    'NuggetSelfRatedPrompt',
+                    'QuestionSelfRatedUnanswerablePromptWithChoices',
+                    'FagB',
+                    'FagB_few',
+                    'HELM',
+                    'Sun',
+                    'Sun_few',
+                    'Thomas',
+                    ]
 
-            def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
-                               encoding: Callable[[int], np.ndarray]):
-                """
-                Introduce a set of features based on the document's ratings
-                represented them as a vector using the given function and
-                sorting the ratings using the given sort key.
-                """
-                nonlocal feats, ratings
-                sorted_ratings = sorted(ratings, key=sort_key, reverse=True)
-                if len(sorted_ratings) < expected_ratings:
-                    padded_ratings = [rating for qstid,rating in sorted_ratings] + [0] * (expected_ratings - len(ratings))
-                else:
-                    padded_ratings = [rating for qstid,rating in sorted_ratings[:expected_ratings]]
+            for pclass in PROMPT_CLASSES:
+                gfilt = GradeFilter.noFilter()
+                gfilt.prompt_class = pclass
 
-                feats += [ encoding(rating) for rating in padded_ratings ]
+                ratings: List[Tuple[QuestionId, int]]
+                ratings = [
+                    (QuestionId(s.get_id()), s.self_rating)
+                    for grades in para.retrieve_exam_grade_all(gfilt)
+                    for s in grades.self_ratings or []
+                    ]
 
-            identity = lambda x: np.array([x])
+                if ratings == 0:
+                    continue
 
-            # Integer ratings sorted by mean question rating
-            rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
+                expected_ratings = 2
 
-            # One-hot ratings sorted by mean question rating
-            rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
+                def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
+                                   encoding: Callable[[int], np.ndarray]):
+                    """
+                    Introduce a set of features based on the document's ratings
+                    represented them as a vector using the given function and
+                    sorting the ratings using the given sort key.
+                    """
+                    nonlocal feats, ratings
+                    sorted_ratings = sorted(ratings, key=sort_key, reverse=True)
+                    if len(sorted_ratings) < expected_ratings:
+                        padded_ratings = [rating for qstid,rating in sorted_ratings] + [0] * (expected_ratings - len(ratings))
+                    else:
+                        padded_ratings = [rating for qstid,rating in sorted_ratings[:expected_ratings]]
 
-            # Integer ratings sorted by question informativeness
-            rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
+                    feats += [ encoding(rating) for rating in padded_ratings ]
 
-            # One-hot ratings sorted by question informativeness
-            rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
+                identity = lambda x: np.array([x])
 
-            # Integer ratings sorted by rating
-            # rating_feature(sort_key=lambda q: q[1], encoding=identity)
+                # Integer ratings sorted by mean question rating
+                rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=identity)
 
-            # One-hot ratings sorted by rating
-            rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+                # One-hot ratings sorted by mean question rating
+                rating_feature(sort_key=lambda q: mean_rating[q[0]], encoding=one_hot_rating)
 
-            # Number of questions answered
-            #feats += [ [sum(1 for qstid,r in ratings if r > 3)] ]
+                # Integer ratings sorted by question informativeness
+                rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
 
-            # One-hot maximum rating
-            #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+                # One-hot ratings sorted by question informativeness
+                rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating)
 
-            # Integer maximum rating
-            #feats += [ [max(rating for qstid, rating in ratings)] ]
+                # Integer ratings sorted by rating
+                # rating_feature(sort_key=lambda q: q[1], encoding=identity)
+
+                # One-hot ratings sorted by rating
+                rating_feature(sort_key=lambda q: q[1], encoding=one_hot_rating)
+
+                # Number of questions answered
+                #feats += [ [sum(1 for qstid,r in ratings if r > 3)] ]
+
+                # One-hot maximum rating
+                #feats += [ one_hot_rating(max(rating for qstid, rating in ratings)) ]
+
+                # Integer maximum rating
+                #feats += [ [max(rating for qstid, rating in ratings)] ]
 
 
             X.append(np.hstack(feats))
