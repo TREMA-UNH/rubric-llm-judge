@@ -2,7 +2,10 @@
 
 set -e -x
 
-name="hi"
+mkdir -p out
+
+if [ -z "$CLASSIFIER" ]; then CLASSIFIER=LinearSVM; fi
+name="out/hi-$CLASSIFIER"
 dataset="/home/ben/rubric-llm-judge/LLMJudge/data"
 judgement_dir="/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge"
 judgements="$judgement_dir/questions-explain--questions-rate--llmjudge-passages_dev.json.gz"
@@ -15,7 +18,7 @@ train() {
         train \
         --qrel $dataset/llm4eval_dev_qrel_2024.txt \
         -j $judgements \
-        -c LogReg \
+        -c $CLASSIFIER \
         -o $name.model
 }
 
