@@ -127,16 +127,12 @@ def build_features(queries: List[QueryWithFullParagraphList],
                 (QuestionId(s.get_id()), s.self_rating)
                 for grades in para.retrieve_exam_grade_all(SELF_GRADED)
                 for s in grades.self_ratings or []
-                #if s.get_id() is not None
                 ]
-
-            expected_ratings = 2
-            if len(ratings) != expected_ratings:
-                #print(f'Query {qid} document {did} has {len(ratings)} ratings')
-                pass
 
             feats: List[np.ndarray]
             feats = []
+
+            expected_ratings = 2
 
             def rating_feature(sort_key: Callable[[Tuple[QuestionId, int]], Any],
                                encoding: Callable[[int], np.ndarray]):
@@ -226,7 +222,6 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
                 penalty='l2',
                 dual=False,
                 fit_intercept=True,
-                #scoring='accuracy',
                 scoring=make_scorer(cohen_kappa_score),
                 #solver='saga', multi_class='multinomial'
                 # solver='liblinear', multi_class='ovr'
