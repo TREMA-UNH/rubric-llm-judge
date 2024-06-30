@@ -385,17 +385,15 @@ def main() -> None:
                     method=args.classifier)
         pickle.dump(clf, args.output)
 
-        # Compute test error
+        # Compute validation error
+        qrel = list(read_qrel(args.qrel))
         test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
                       for q in test_queries
                       for para in q.paragraphs
                       ]
-        truth = {(QueryId(q.queryId), DocId(para.paragraph_id)): s.self_rating
-                 for q in test_queries
-                 for para in q.paragraphs
-                 for grades in para.retrieve_exam_grade_any(SELF_GRADED)
-                 for s in grades.self_ratings or []
-                 }
+        truth = {(qid,did): rel
+                 for qid, did, rel in qrel
+                 if rel is not None }
 
         print('Validation set prediction')
         predict(clf=clf,
