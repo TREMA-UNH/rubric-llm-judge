@@ -221,7 +221,11 @@ class Method(enum.Enum):
     HistGradientBoostedClassifier = enum.auto()
 
 
-def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method) -> Pipeline:
+def train(qrel: Path,
+          queries: List[QueryWithFullParagraphList],
+          method: Method,
+          random_state: np.random.RandomState,
+          ) -> Pipeline:
     rels = {
         (qid, did): rel
         for (qid, did, rel) in read_qrel(qrel)
@@ -234,14 +238,17 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
     X = scaler.fit_transform(X, y)
 
     if method == Method.MLP:
-        clf = MLPClassifier(hidden_layer_sizes=(5,1),
-                            activation='tanh',
-                            learning_rate='constant',
-                            solver='adam')
+        clf = MLPClassifier(
+                random_state=random_state,
+                hidden_layer_sizes=(5,1),
+                activation='tanh',
+                learning_rate='constant',
+                solver='adam')
     elif method == Method.DecisionTree:
-        clf = sklearn.tree.DecisionTreeClassifier()
+        clf = sklearn.tree.DecisionTreeClassifier(random_state=random_state)
     elif method == Method.LogRegCV:
         clf = LogisticRegressionCV(
+                random_state=random_state,
                 cv=StratifiedKFold(5, shuffle=False),
                 # cv=KFold(n_splits=2, shuffle=False),
                 class_weight='balanced',
@@ -250,33 +257,35 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
                 dual=False,
                 fit_intercept=True,
                 scoring=make_scorer(cohen_kappa_score),
-                #solver='saga', multi_class='multinomial'
-                # solver='liblinear', multi_class='ovr'
+                solver='sag', multi_class='multinomial'
                 )
     elif method == Method.LogReg:
         clf = LogisticRegression(
+                random_state=random_state,
                 #class_weight='balanced',
                 class_weight="balanced",
                 max_iter=10000,
                 penalty='l2',
                 dual=False,
-                #solver='saga', multi_class='multinomial'
-                # solver='liblinear',  multi_class='ovr'
-                fit_intercept=True
+                solver='sag', multi_class='multinomial',
+                fit_intercept=True,
                 )
     elif method == Method.SVM:
         # implement grid search: https://scikit-learn.org/stable/auto_examples/model_selection/plot_nested_cross_validation_iris.html#sphx-glr-auto-examples-model-selection-plot-nested-cross-validation-iris-py
         clf = SVC(
+                random_state=random_state,
                 decision_function_shape='ovo',
                 class_weight="balanced"
                 )
     elif method == Method.LinearSVM:
         clf = LinearSVC(
+                random_state=random_state,
                 class_weight="balanced",
                 dual=False
               )
     elif method == Method.RandomForest:
         clf = RandomForestClassifier(
+                random_state=random_state,
                 class_weight="balanced",
                 max_depth=2,
                 n_estimators=5,
@@ -284,6 +293,7 @@ def train(qrel: Path, queries: List[QueryWithFullParagraphList], method: Method)
               )
     elif method == Method.HistGradientBoostedClassifier:
         clf = HistGradientBoostingClassifier(
+                random_state=random_state,
                 class_weight="balanced",
                 max_depth=2,
                 scoring=make_scorer(cohen_kappa_score)
@@ -414,10 +424,13 @@ def main() -> None:
         train_queries, test_queries = train_test_split(queries, test_size=0.5)
 
         restarts = []
+        random_state = np.random.RandomState()
         for i in range(args.restarts):
+            np.random.seed(i)
             clf = train(qrel=args.qrel,
                         queries=train_queries,
-                        method=args.classifier)
+                        method=args.classifier,
+                        random_state=random_state)
 
             # Compute validation error
             test_pairs = [(QueryId(q.queryId), DocId(para.paragraph_id))
