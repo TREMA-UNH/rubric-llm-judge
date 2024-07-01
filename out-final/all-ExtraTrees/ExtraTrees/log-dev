@@ -1,0 +1,138 @@
++ git rev-parse HEAD
+6b3620b6066aa1ed106a765bb58869ac164295d4
++ train
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label train --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --classifier ExtraTrees --restarts 5 --output out-final/all-ExtraTrees/ExtraTrees/model
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6200383246646591
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1391  142  176  249]
+ [ 300  314  210  108]
+ [  66   13  286   49]
+ [  41    4   30  274]]
+INFO:root:Train kappa=0.42741013384202464
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1843  313  326   98]
+ [ 228   42  177   24]
+ [  59   41   98   13]
+ [ 111   71  140   26]]
+INFO:root:Validation kappa=0.15229927204287952
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6244182863399945
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1399  130  186  243]
+ [ 298  319  208  107]
+ [  68   11  283   52]
+ [  38    7   24  280]]
+INFO:root:Train kappa=0.4337239746780438
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1843  315  322  100]
+ [ 217   54  181   19]
+ [  60   36  102   13]
+ [ 103   69  149   27]]
+INFO:root:Validation kappa=0.1663255130425656
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6134683821516562
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1369  150  191  248]
+ [ 299  324  201  108]
+ [  63   20  277   54]
+ [  38    9   31  271]]
+INFO:root:Train kappa=0.4194305055961872
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1864  277  330  109]
+ [ 221   56  168   26]
+ [  63   35  104    9]
+ [ 103   71  141   33]]
+INFO:root:Validation kappa=0.17546477018058404
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.624692033944703
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1383  158  194  223]
+ [ 287  344  199  102]
+ [  61   19  285   49]
+ [  35   12   32  270]]
+INFO:root:Train kappa=0.4354424335391809
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1853  311  314  102]
+ [ 219   60  172   20]
+ [  60   47   95    9]
+ [ 108   61  145   34]]
+INFO:root:Validation kappa=0.16961396925338335
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6082671776621954
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1355  151  202  250]
+ [ 289  308  225  110]
+ [  59   14  291   50]
+ [  34   11   36  268]]
+INFO:root:Train kappa=0.41550346581432296
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1826  301  351  102]
+ [ 214   53  182   22]
+ [  62   39   98   12]
+ [  98   69  143   38]]
+INFO:root:Validation kappa=0.16728034116638457
+INFO:root:Best model: train kappa=0.4194305055961872, validation kappa=0.17546477018058404
+Method.ExtraTrees 0 0.42741013384202464 0.15229927204287952
+Method.ExtraTrees 1 0.4337239746780438 0.1663255130425656
+Method.ExtraTrees 2 0.4194305055961872 0.17546477018058404
+Method.ExtraTrees 3 0.4354424335391809 0.16961396925338335
+Method.ExtraTrees 4 0.41550346581432296 0.16728034116638457
++ predict
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label predict --model out-final/all-ExtraTrees/ExtraTrees/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --output out-final/all-ExtraTrees/ExtraTrees/dev.jsonl.gz --output-qrel out-final/all-ExtraTrees/ExtraTrees/dev.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[3233  427  521  357]
+ [ 520  380  369  134]
+ [ 126   55  381   63]
+ [ 141   80  172  304]]
+INFO:root:Kappa=0.3203876922948745

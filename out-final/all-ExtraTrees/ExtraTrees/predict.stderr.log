@@ -1,0 +1,11 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[3258  415  513  352]
+ [ 511  371  393  128]
+ [ 122   50  389   64]
+ [ 144   76  176  301]]
+INFO:root:Kappa=0.32446735661613435

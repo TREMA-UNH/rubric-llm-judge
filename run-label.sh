@@ -41,7 +41,9 @@ train() {
         --judgements $judgements \
         --classifier $CLASSIFIER \
         --restarts $RESTARTS \
-        --output $(model_dir)/model
+        --output $(model_dir)/model \
+        > $(model_dir)/train.stdout.log \
+        2> $(model_dir)/train.stderr.log
 }
 
 predict() {
@@ -51,17 +53,21 @@ predict() {
         --qrel $dataset/llm4eval_dev_qrel_2024.txt \
         --judgements $judgements \
         --output $(model_dir)/dev.jsonl.gz \
-        --output-qrel $(model_dir)/dev.qrel
+        --output-qrel $(model_dir)/dev.qrel \
+        > $(model_dir)/predict.stdout.log \
+        2> $(model_dir)/predict.stderr.log
 }
 
-test() {
+run_test() {
     python -m rubric_llm_judge.label \
         predict \
         -m $(model_dir)/model \
         --qrel $dataset/llm4eval_test_qrel_2024.txt \
         -j $test_judgements \
         -o $(model_dir)/test.jsonl.gz \
-        --output-qrel $(model_dir)/test.qrel
+        --output-qrel $(model_dir)/test.qrel \
+        > $(model_dir)/test.stdout.log \
+        2> $(model_dir)/test.stderr.log
 }
 
 exampp_balance() {
@@ -86,16 +92,21 @@ final_run() {
     OUT="out-final/$NAME-$CLASSIFIER"
     judgements="$judgement_dir/all-llmjudge-passages_dev.json.gz"
     test_judgements="$judgement_dir/all-llmjudge-passages_test.json.gz"
-    (git rev-parse HEAD; train; predict) 2> $(model_dir)/log-dev.stderr > $(model_dir)/log-dev.stdout
+    git rev-parse HEAD > $(model_dir)/commit
+    train
+    predict
 
     printf "Running $OUT test..."
-    (git rev-parse HEAD; test) 2> $(model_dir)/log-test.stderr > $(model_dir)/log-dev.stdout
+    run_test
 
     cp $(model_dir)/dev.qrel submission/llm4eval_dev_qrel_2024-all-$CLASSIFIER-$NAME.txt
     cp $(model_dir)/test.qrel submission/llm4eval_test_qrel_2024-all-$CLASSIFIER-$NAME.txt
+
+    sed -e "s/^/$NAME /" $(model_dir)/train.stdout.log >> out-final/summary
 }
 
 final_runs() {
+    rm -f out-final/summary
     LABEL_PROMPTS="nuggets questions direct" NAME="all" CLASSIFIER=ExtraTrees final_run
     LABEL_PROMPTS="nuggets questions direct" NAME="all" CLASSIFIER=RandomForest final_run
     LABEL_PROMPTS="nuggets" NAME="nuggets" CLASSIFIER=ExtraTrees final_run

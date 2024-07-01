@@ -1,0 +1,136 @@
+++ model_dir
+++ local dir=out-final/direct-RandomForest/RandomForest
+++ mkdir -p out-final/direct-RandomForest/RandomForest
+++ printf out-final/direct-RandomForest/RandomForest
++ git rev-parse HEAD
++ train
+++ model_dir
+++ local dir=out-final/direct-RandomForest/RandomForest
+++ mkdir -p out-final/direct-RandomForest/RandomForest
+++ printf out-final/direct-RandomForest/RandomForest
++ python -m rubric_llm_judge.label train --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --classifier RandomForest --restarts 5 --output out-final/direct-RandomForest/RandomForest/model
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4664659184232138
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1295  117   68  478]
+ [ 435   88   63  346]
+ [ 113   20   60  221]
+ [  51   30    7  261]]
+INFO:root:Train kappa=0.19647061784446107
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1978  143  103  356]
+ [ 260   35   28  148]
+ [  56   21   20  114]
+ [ 132   20    8  188]]
+INFO:root:Validation kappa=0.21107285054958957
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4607172187243362
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1302   63   55  538]
+ [ 430   47   63  392]
+ [ 114    8   55  237]
+ [  52   15    3  279]]
+INFO:root:Train kappa=0.19382868222360217
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1998   62   90  430]
+ [ 265   17   23  166]
+ [  58   11   17  125]
+ [ 134   12    7  195]]
+INFO:root:Validation kappa=0.20783126269440144
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4571584998631262
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1297   41  111  509]
+ [ 429   42   97  364]
+ [ 113    3   64  234]
+ [  52   10   20  267]]
+INFO:root:Train kappa=0.19080166377250962
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1995   30  152  403]
+ [ 267   11   36  157]
+ [  58    4   28  121]
+ [ 133    5   20  190]]
+INFO:root:Validation kappa=0.20917743996828786
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.46181220914317
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1295   76   68  519]
+ [ 429   63   64  376]
+ [ 113    8   57  236]
+ [  52   21    4  272]]
+INFO:root:Train kappa=0.19483157470125967
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1995   65  101  419]
+ [ 267   21   24  159]
+ [  58   10   18  125]
+ [ 134    6    7  201]]
+INFO:root:Validation kappa=0.21291474695298307
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4574322474678347
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1294   66   58  540]
+ [ 433   43   64  392]
+ [ 113    9   55  237]
+ [  51   16    3  279]]
+INFO:root:Train kappa=0.1898636589101732
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1973   81   93  433]
+ [ 261   20   23  167]
+ [  56   13   17  125]
+ [ 132   13    8  195]]
+INFO:root:Validation kappa=0.20421105018629937
+INFO:root:Best model: train kappa=0.19483157470125967, validation kappa=0.21291474695298307
++ predict
+++ model_dir
+++ local dir=out-final/direct-RandomForest/RandomForest
+++ mkdir -p out-final/direct-RandomForest/RandomForest
+++ printf out-final/direct-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/direct-RandomForest/RandomForest
+++ mkdir -p out-final/direct-RandomForest/RandomForest
+++ printf out-final/direct-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/direct-RandomForest/RandomForest
+++ mkdir -p out-final/direct-RandomForest/RandomForest
+++ printf out-final/direct-RandomForest/RandomForest
++ python -m rubric_llm_judge.label predict --model out-final/direct-RandomForest/RandomForest/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --output out-final/direct-RandomForest/RandomForest/dev.jsonl.gz --output-qrel out-final/direct-RandomForest/RandomForest/dev.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[3290  141  169  938]
+ [ 696   84   88  535]
+ [ 171   18   75  361]
+ [ 186   27   11  473]]
+INFO:root:Kappa=0.21321252802760293

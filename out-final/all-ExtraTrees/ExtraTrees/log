@@ -1,0 +1,183 @@
++ git rev-parse HEAD
+1fa7d1b43e3ab8ffad48288f72317983be1f6b88
++ train
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label train --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --classifier ExtraTrees --restarts 5 --output out-final/all-ExtraTrees/ExtraTrees/model
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.615110867779907
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1389  117  206  246]
+ [ 307  302  218  105]
+ [  66   16  279   53]
+ [  36    6   30  277]]
+INFO:root:Train kappa=0.42107256467753607
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1873  323  282  102]
+ [ 220   59  171   21]
+ [  63   37  103    8]
+ [ 115   65  134   34]]
+INFO:root:Validation kappa=0.17486583250592636
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6225020531070353
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1372  154  190  242]
+ [ 297  334  201  100]
+ [  64   13  291   46]
+ [  40    4   28  277]]
+INFO:root:Train kappa=0.4324719277077216
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1857  302  316  105]
+ [ 217   55  176   23]
+ [  64   42   94   11]
+ [ 101   71  143   33]]
+INFO:root:Validation kappa=0.16848265543180163
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6189433342458254
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1372  156  174  256]
+ [ 290  334  194  114]
+ [  62   21  275   56]
+ [  37    8   24  280]]
+INFO:root:Train kappa=0.42802012703749814
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1848  316  318   98]
+ [ 219   48  179   25]
+ [  58   40  103   10]
+ [ 103   72  138   35]]
+INFO:root:Validation kappa=0.1688883266364588
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6214070626882015
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1380  142  186  250]
+ [ 286  328  207  111]
+ [  62    9  290   53]
+ [  40    3   34  272]]
+INFO:root:Train kappa=0.4321690817178324
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1810  347  317  106]
+ [ 222   51  177   21]
+ [  60   34  107   10]
+ [ 105   62  147   34]]
+INFO:root:Validation kappa=0.16039590212660704
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6167533534081577
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1372  142  195  249]
+ [ 286  324  211  111]
+ [  60   18  286   50]
+ [  39    8   31  271]]
+INFO:root:Train kappa=0.4259298921005923
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1865  276  352   87]
+ [ 221   56  171   23]
+ [  58   41  101   11]
+ [ 105   71  143   29]]
+INFO:root:Validation kappa=0.17314709618822777
+INFO:root:Best model: train kappa=0.42107256467753607, validation kappa=0.17486583250592636
+Method.ExtraTrees 0 0.42107256467753607 0.17486583250592636
+Method.ExtraTrees 1 0.4324719277077216 0.16848265543180163
+Method.ExtraTrees 2 0.42802012703749814 0.1688883266364588
+Method.ExtraTrees 3 0.4321690817178324 0.16039590212660704
+Method.ExtraTrees 4 0.4259298921005923 0.17314709618822777
++ predict
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label predict --model out-final/all-ExtraTrees/ExtraTrees/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --output out-final/all-ExtraTrees/ExtraTrees/dev.jsonl.gz --output-qrel out-final/all-ExtraTrees/ExtraTrees/dev.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[3262  440  488  348]
+ [ 527  361  389  126]
+ [ 129   53  382   61]
+ [ 151   71  164  311]]
+INFO:root:Kappa=0.3207051519975017
++ test
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/all-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/all-ExtraTrees/ExtraTrees
+++ printf out-final/all-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label predict -m out-final/all-ExtraTrees/ExtraTrees/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_test_qrel_2024.txt -j /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/nuggets-explain--nuggets-rate--all-llmjudge-passages_test.json.gz -o out-final/all-ExtraTrees/ExtraTrees/test.jsonl.gz --output-qrel out-final/all-ExtraTrees/ExtraTrees/test.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (4423, 205)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ben/rubric-llm-judge/rubric_llm_judge/label.py", line 559, in <module>
+    main()
+  File "/home/ben/rubric-llm-judge/rubric_llm_judge/label.py", line 547, in main
+    kappa = predict(clf=clf,
+            ^^^^^^^^^^^^^^^^
+  File "/home/ben/rubric-llm-judge/rubric_llm_judge/label.py", line 408, in predict
+    y = clf.predict(X)
+        ^^^^^^^^^^^^^^
+  File "/nix/store/l3kszw083nipdrk31n3jykkgwmiczxql-python3-3.11.6-env/lib/python3.11/site-packages/sklearn/pipeline.py", line 507, in predict
+    Xt = transform.transform(Xt)
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/l3kszw083nipdrk31n3jykkgwmiczxql-python3-3.11.6-env/lib/python3.11/site-packages/sklearn/utils/_set_output.py", line 140, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/l3kszw083nipdrk31n3jykkgwmiczxql-python3-3.11.6-env/lib/python3.11/site-packages/sklearn/preprocessing/_data.py", line 1004, in transform
+    X = self._validate_data(
+        ^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/l3kszw083nipdrk31n3jykkgwmiczxql-python3-3.11.6-env/lib/python3.11/site-packages/sklearn/base.py", line 625, in _validate_data
+    self._check_n_features(X, reset=reset)
+  File "/nix/store/l3kszw083nipdrk31n3jykkgwmiczxql-python3-3.11.6-env/lib/python3.11/site-packages/sklearn/base.py", line 414, in _check_n_features
+    raise ValueError(
+ValueError: X has 205 features, but StandardScaler is expecting 429 features as input.

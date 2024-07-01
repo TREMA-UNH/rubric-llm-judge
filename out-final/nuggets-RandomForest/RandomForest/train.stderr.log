@@ -1,0 +1,100 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.3826991513824254
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[756 203 382 617]
+ [208 197 284 243]
+ [ 55  38 206 115]
+ [ 32  20  58 239]]
+INFO:root:Train kappa=0.18042741863512146
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1148  376  563  493]
+ [  96   99  199   77]
+ [  31   27  129   24]
+ [  44   89  149   66]]
+INFO:root:Validation kappa=0.120778188278308
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.40843142622502054
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[834 206 388 530]
+ [246 219 257 210]
+ [ 85  41 201  87]
+ [ 40  18  53 238]]
+INFO:root:Train kappa=0.1936583636872501
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1291  384  613  292]
+ [ 126   88  203   54]
+ [  38   37  120   16]
+ [  77   80  149   42]]
+INFO:root:Validation kappa=0.11425950306631627
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.40213523131672596
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[816 169 401 572]
+ [250 196 261 225]
+ [ 75  29 211  99]
+ [ 33  13  57 246]]
+INFO:root:Train kappa=0.19272474492338465
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1342  310  621  307]
+ [ 121   63  229   58]
+ [  41   32  123   15]
+ [  77   58  180   33]]
+INFO:root:Validation kappa=0.11393692411631962
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.4013139885026006
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[822 212 344 580]
+ [255 206 252 219]
+ [ 68  42 196 108]
+ [ 36  19  52 242]]
+INFO:root:Train kappa=0.18769942469705136
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1262  400  486  432]
+ [ 130   85  195   61]
+ [  48   33  110   20]
+ [  81   63  147   57]]
+INFO:root:Validation kappa=0.10327470128849392
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.3868053654530523
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[766 210 353 629]
+ [226 211 278 217]
+ [ 64  48 193 109]
+ [ 35  23  48 243]]
+INFO:root:Train kappa=0.17931329350347525
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1262  378  546  394]
+ [ 116   79  212   64]
+ [  34   33  122   22]
+ [  66   65  168   49]]
+INFO:root:Validation kappa=0.11440927430081149
+INFO:root:Best model: train kappa=0.18042741863512146, validation kappa=0.120778188278308

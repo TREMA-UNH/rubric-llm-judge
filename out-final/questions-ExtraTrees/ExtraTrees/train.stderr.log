@@ -1,0 +1,100 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5036955926635642
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1265  100  205  388]
+ [ 417  139  216  160]
+ [  94   12  240   68]
+ [  87   16   50  196]]
+INFO:root:Train kappa=0.2533441397130056
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1738  165  328  349]
+ [ 206   34  169   62]
+ [  82   12   78   39]
+ [ 106   47  139   56]]
+INFO:root:Validation kappa=0.13155487288374879
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5080755543388995
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1256  114  204  384]
+ [ 399  169  193  171]
+ [  93   24  226   71]
+ [  84   13   47  205]]
+INFO:root:Train kappa=0.2617350265651819
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1668  219  338  355]
+ [ 205   33  155   78]
+ [  79   18   82   32]
+ [  98   50  142   58]]
+INFO:root:Validation kappa=0.12026288698209919
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5039693402682727
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1246  121  221  370]
+ [ 402  162  205  163]
+ [  91   18  235   70]
+ [  87   17   47  198]]
+INFO:root:Train kappa=0.25627096614136713
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1699  175  343  363]
+ [ 211   24  161   75]
+ [  77   21   79   34]
+ [  67   83  143   55]]
+INFO:root:Validation kappa=0.1275462760314524
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5067068163153572
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1261  104  230  363]
+ [ 409  156  214  153]
+ [  94   14  241   65]
+ [  86   16   54  193]]
+INFO:root:Train kappa=0.2583499075064809
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1712  177  326  365]
+ [ 209   31  158   73]
+ [  80   17   87   27]
+ [ 105   46  135   62]]
+INFO:root:Validation kappa=0.13120706713919505
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5132767588283602
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1279   90  214  375]
+ [ 412  159  202  159]
+ [  94   15  242   63]
+ [  91   12   51  195]]
+INFO:root:Train kappa=0.26560286113747844
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1748  176  304  352]
+ [ 216   23  155   77]
+ [  83   13   82   33]
+ [ 105   44  135   64]]
+INFO:root:Validation kappa=0.13107647774706843
+INFO:root:Best model: train kappa=0.2533441397130056, validation kappa=0.13155487288374879

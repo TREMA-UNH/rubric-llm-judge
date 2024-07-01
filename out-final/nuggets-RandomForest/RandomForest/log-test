@@ -1,0 +1,23 @@
++ git rev-parse HEAD
+6b3620b6066aa1ed106a765bb58869ac164295d4
++ test
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
++ python -m rubric_llm_judge.label predict -m out-final/nuggets-RandomForest/RandomForest/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_test_qrel_2024.txt -j /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_test.json.gz -o out-final/nuggets-RandomForest/RandomForest/test.jsonl.gz --output-qrel out-final/nuggets-RandomForest/RandomForest/test.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (4423, 205)
+INFO:root:Kappa=None

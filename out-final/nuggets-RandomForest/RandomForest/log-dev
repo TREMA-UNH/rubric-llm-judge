@@ -1,0 +1,138 @@
++ git rev-parse HEAD
+6b3620b6066aa1ed106a765bb58869ac164295d4
++ train
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
++ python -m rubric_llm_judge.label train --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --classifier RandomForest --restarts 5 --output out-final/nuggets-RandomForest/RandomForest/model
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.40569395017793597
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[842 197 366 553]
+ [266 195 267 204]
+ [ 84  37 206  87]
+ [ 39  21  50 239]]
+INFO:root:Train kappa=0.1881555761064576
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1299  372  540  369]
+ [ 138   72  206   55]
+ [  37   43  106   25]
+ [  71   63  159   55]]
+INFO:root:Validation kappa=0.10676728937275759
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.39583903640843143
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[811 172 385 590]
+ [234 177 277 244]
+ [ 71  32 211 100]
+ [ 31  17  54 247]]
+INFO:root:Train kappa=0.18823856942920136
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1299  334  552  395]
+ [ 107   79  210   75]
+ [  39   24  128   20]
+ [  68   60  162   58]]
+INFO:root:Validation kappa=0.12918689282471618
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.38434163701067614
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[715 223 334 686]
+ [209 253 223 247]
+ [ 66  49 182 117]
+ [ 27  23  45 254]]
+INFO:root:Train kappa=0.18356059969898786
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1021  436  536  587]
+ [  90   87  207   87]
+ [  17   43  116   35]
+ [  50   82  152   64]]
+INFO:root:Validation kappa=0.08939465159684168
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.40733643580618667
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[844 186 343 585]
+ [222 196 254 260]
+ [ 78  30 208  98]
+ [ 42  22  45 240]]
+INFO:root:Train kappa=0.19732342525083324
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1368  338  550  324]
+ [ 121   77  209   64]
+ [  39   33  122   17]
+ [  95   64  160   29]]
+INFO:root:Validation kappa=0.11689466380417646
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.4111689022721051
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[850 168 397 543]
+ [256 200 263 213]
+ [ 80  32 212  90]
+ [ 38  11  60 240]]
+INFO:root:Train kappa=0.19819583928534812
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1275  314  593  398]
+ [ 118   76  208   69]
+ [  41   39  108   23]
+ [  69   74  153   52]]
+INFO:root:Validation kappa=0.10904013745731944
+INFO:root:Best model: train kappa=0.18823856942920136, validation kappa=0.12918689282471618
+Method.RandomForest 0 0.1881555761064576 0.10676728937275759
+Method.RandomForest 1 0.18823856942920136 0.12918689282471618
+Method.RandomForest 2 0.18356059969898786 0.08939465159684168
+Method.RandomForest 3 0.19732342525083324 0.11689466380417646
+Method.RandomForest 4 0.19819583928534812 0.10904013745731944
++ predict
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
+++ model_dir
+++ local dir=out-final/nuggets-RandomForest/RandomForest
+++ mkdir -p out-final/nuggets-RandomForest/RandomForest
+++ printf out-final/nuggets-RandomForest/RandomForest
++ python -m rubric_llm_judge.label predict --model out-final/nuggets-RandomForest/RandomForest/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --output out-final/nuggets-RandomForest/RandomForest/dev.jsonl.gz --output-qrel out-final/nuggets-RandomForest/RandomForest/dev.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[2110  506  937  985]
+ [ 341  256  487  319]
+ [ 110   56  339  120]
+ [  99   77  216  305]]
+INFO:root:Kappa=0.1647506479836255

@@ -1,0 +1,100 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6131946345469477
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1374  148  186  250]
+ [ 298  312  222  100]
+ [  65   11  289   49]
+ [  43    5   36  265]]
+INFO:root:Train kappa=0.41875090579312346
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1847  320  303  110]
+ [ 219   53  176   23]
+ [  59   35  107   10]
+ [ 112   66  142   28]]
+INFO:root:Validation kappa=0.16683396172777454
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6194908294552423
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1385  132  189  252]
+ [ 287  327  213  105]
+ [  61   17  278   58]
+ [  41    8   27  273]]
+INFO:root:Train kappa=0.4286419326885652
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1866  316  301   97]
+ [ 224   57  169   21]
+ [  62   39   96   14]
+ [ 109   69  139   31]]
+INFO:root:Validation kappa=0.1677467122034555
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6219545578976184
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1384  143  186  245]
+ [ 297  327  209   99]
+ [  67   11  284   52]
+ [  43    2   27  277]]
+INFO:root:Train kappa=0.4306304494400537
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1845  333  306   96]
+ [ 222   71  158   20]
+ [  62   43   95   11]
+ [ 108   68  138   34]]
+INFO:root:Validation kappa=0.17099536609058286
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6189433342458254
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1380  138  187  253]
+ [ 289  326  211  106]
+ [  60   19  284   51]
+ [  39   10   29  271]]
+INFO:root:Train kappa=0.42808670988709463
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1878  277  326   99]
+ [ 222   45  182   22]
+ [  62   31  105   13]
+ [ 105   66  147   30]]
+INFO:root:Validation kappa=0.17223107948205052
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 429)
+INFO:root:training score: 0.6131946345469477
+INFO:root:Train set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1373  140  193  252]
+ [ 287  313  218  114]
+ [  58   23  281   52]
+ [  36    7   33  273]]
+INFO:root:Train kappa=0.421245256548889
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes NuggetSelfRatedPrompt,QuestionSelfRatedUnanswerablePromptWithChoices,FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 429)
+INFO:root:[[1839  326  313  102]
+ [ 221   52  176   22]
+ [  59   45   95   12]
+ [ 102   69  141   36]]
+INFO:root:Validation kappa=0.16401027392915368
+INFO:root:Best model: train kappa=0.42808670988709463, validation kappa=0.17223107948205052

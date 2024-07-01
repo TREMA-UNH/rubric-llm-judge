@@ -1,0 +1,11 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[3328   75  276  859]
+ [ 698   60  172  473]
+ [ 175    8  135  307]
+ [ 187   15   56  439]]
+INFO:root:Kappa=0.2208016117515642

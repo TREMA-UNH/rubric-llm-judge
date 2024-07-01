@@ -1,0 +1,100 @@
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4563372570490008
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1316    2   53  587]
+ [ 442    2   62  426]
+ [ 114    0   55  245]
+ [  52    0    3  294]]
+INFO:root:Train kappa=0.19032581681318284
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[2005    6   85  484]
+ [ 269    0   23  179]
+ [  58    0   17  136]
+ [ 134    0    8  206]]
+INFO:root:Validation kappa=0.20673104060601744
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.46318094716671226
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1302   75   76  505]
+ [ 440   60   65  367]
+ [ 113   18   61  222]
+ [  52   21    7  269]]
+INFO:root:Train kappa=0.19385160365792853
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1994   94  109  383]
+ [ 267   22   27  155]
+ [  58   15   20  118]
+ [ 133   18    8  189]]
+INFO:root:Validation kappa=0.2072660369739041
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.45825349028196005
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1307    0  109  542]
+ [ 441    2  110  379]
+ [ 113    0   94  207]
+ [  52    0   26  271]]
+INFO:root:Train kappa=0.1939061096792768
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1995    1  127  457]
+ [ 269    0   40  162]
+ [  58    0   24  129]
+ [ 134    0   20  194]]
+INFO:root:Validation kappa=0.20238495150575408
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4604434711196277
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1307   30   53  568]
+ [ 431   30   62  409]
+ [ 114    8   55  237]
+ [  52    4    3  290]]
+INFO:root:Train kappa=0.19577124583438277
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[2007   40   85  448]
+ [ 267    7   23  174]
+ [  58    4   17  132]
+ [ 134    4    7  203]]
+INFO:root:Validation kappa=0.20940018242799208
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (3653, 19)
+INFO:root:training score: 0.4670134136326307
+INFO:root:Train set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1302  100   77  479]
+ [ 439   82   65  346]
+ [ 113   19   61  221]
+ [  52   29    7  261]]
+INFO:root:Train kappa=0.1967954215338692
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes FagB,FagB_few,HELM,Sun,Sun_few,Thomas
+INFO:root:feature shape: (7263, 19)
+INFO:root:[[1996  119  109  356]
+ [ 269   27   27  148]
+ [  58   19   20  114]
+ [ 133   19    8  188]]
+INFO:root:Validation kappa=0.20904074190354294
+INFO:root:Best model: train kappa=0.19577124583438277, validation kappa=0.20940018242799208

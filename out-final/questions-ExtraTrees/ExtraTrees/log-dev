@@ -1,0 +1,138 @@
++ git rev-parse HEAD
+6b3620b6066aa1ed106a765bb58869ac164295d4
++ train
+++ model_dir
+++ local dir=out-final/questions-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/questions-ExtraTrees/ExtraTrees
+++ printf out-final/questions-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label train --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --classifier ExtraTrees --restarts 5 --output out-final/questions-ExtraTrees/ExtraTrees/model
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5116342732001095
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1281   89  205  383]
+ [ 416  149  201  166]
+ [  94   13  241   66]
+ [  91   11   49  198]]
+INFO:root:Train kappa=0.2630706692955235
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1724  201  349  306]
+ [ 206   32  164   69]
+ [  82   14   85   30]
+ [ 101   49  134   64]]
+INFO:root:Validation kappa=0.13594900245385688
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.501779359430605
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1261  101  182  414]
+ [ 410  152  191  179]
+ [  93   12  218   91]
+ [  86   17   44  202]]
+INFO:root:Train kappa=0.2519045128033288
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1705  188  336  351]
+ [ 207   31  156   77]
+ [  81   12   83   35]
+ [ 103   44  145   56]]
+INFO:root:Validation kappa=0.12551905006769415
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5045168354776896
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1254   86  181  437]
+ [ 406  152  190  184]
+ [  93   13  227   81]
+ [  86    9   44  210]]
+INFO:root:Train kappa=0.25852373113642313
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1720  188  303  369]
+ [ 206   31  168   66]
+ [  81   15   83   32]
+ [ 104   41  145   58]]
+INFO:root:Validation kappa=0.12966955121845247
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5108130303859841
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1276   87  229  366]
+ [ 412  152  215  153]
+ [  94   12  244   64]
+ [  91    9   55  194]]
+INFO:root:Train kappa=0.26288101373309325
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1739  155  337  349]
+ [ 214   22  158   77]
+ [  82   14   79   36]
+ [ 104   43  146   55]]
+INFO:root:Validation kappa=0.12448401525575459
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (3653, 205)
+INFO:root:training score: 0.5064330687106487
+INFO:root:Train set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1265  104  212  377]
+ [ 411  145  210  166]
+ [  93   14  241   66]
+ [  86   12   52  199]]
+INFO:root:Train kappa=0.2581272371972254
+INFO:root:Validation set prediction
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[1741  175  318  346]
+ [ 212   31  158   70]
+ [  81   14   80   36]
+ [ 107   42  144   55]]
+INFO:root:Validation kappa=0.12929899266115286
+INFO:root:Best model: train kappa=0.2630706692955235, validation kappa=0.13594900245385688
+Method.ExtraTrees 0 0.2630706692955235 0.13594900245385688
+Method.ExtraTrees 1 0.2519045128033288 0.12551905006769415
+Method.ExtraTrees 2 0.25852373113642313 0.12966955121845247
+Method.ExtraTrees 3 0.26288101373309325 0.12448401525575459
+Method.ExtraTrees 4 0.2581272371972254 0.12929899266115286
++ predict
+++ model_dir
+++ local dir=out-final/questions-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/questions-ExtraTrees/ExtraTrees
+++ printf out-final/questions-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/questions-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/questions-ExtraTrees/ExtraTrees
+++ printf out-final/questions-ExtraTrees/ExtraTrees
+++ model_dir
+++ local dir=out-final/questions-ExtraTrees/ExtraTrees
+++ mkdir -p out-final/questions-ExtraTrees/ExtraTrees
+++ printf out-final/questions-ExtraTrees/ExtraTrees
++ python -m rubric_llm_judge.label predict --model out-final/questions-ExtraTrees/ExtraTrees/model --qrel /home/ben/rubric-llm-judge/LLMJudge/data/llm4eval_dev_qrel_2024.txt --judgements /home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge/all-llmjudge-passages_dev.json.gz --output out-final/questions-ExtraTrees/ExtraTrees/dev.jsonl.gz --output-qrel out-final/questions-ExtraTrees/ExtraTrees/dev.qrel
+[nltk_data] Downloading package stopwords to /home/ben/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+[nltk_data] Downloading package punkt to /home/ben/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+INFO:root:Using prompt classes QuestionSelfRatedUnanswerablePromptWithChoices
+INFO:root:feature shape: (7263, 205)
+INFO:root:[[3005  290  554  689]
+ [ 622  181  365  235]
+ [ 176   27  326   96]
+ [ 192   60  183  262]]
+INFO:root:Kappa=0.2094137350496902
