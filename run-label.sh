@@ -86,11 +86,12 @@ final_run() {
     OUT="out-final/$NAME-$CLASSIFIER"
     judgements="$judgement_dir/all-llmjudge-passages_dev.json.gz"
     test_judgements="$judgement_dir/all-llmjudge-passages_test.json.gz"
-    (git rev-parse HEAD; train; predict) |& tee $(model_dir)/log-dev
+    (git rev-parse HEAD; train; predict) 2> $(model_dir)/log-dev.stderr > $(model_dir)/log-dev.stdout
 
     printf "Running $OUT test..."
-    (git rev-parse HEAD; test) |& tee $(model_dir)/log-test
+    (git rev-parse HEAD; test) 2> $(model_dir)/log-test.stderr > $(model_dir)/log-dev.stdout
 
+    cp $(model_dir)/dev.qrel submission/llm4eval_dev_qrel_2024-all-$CLASSIFIER-$NAME.txt
     cp $(model_dir)/test.qrel submission/llm4eval_test_qrel_2024-all-$CLASSIFIER-$NAME.txt
 }
 
