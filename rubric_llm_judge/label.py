@@ -200,7 +200,7 @@ def build_features(queries: List[QueryWithFullParagraphList],
                         #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=identity)
 
                         # One-hot ratings sorted by question informativeness
-                        #rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating(6))
+                        rating_feature(sort_key=lambda q: hist[q[0]][4]+hist[q[0]][5], encoding=one_hot_rating(6))
 
                         # Integer ratings sorted by rating
                         rating_feature(sort_key=lambda q: q[1], encoding=identity)
