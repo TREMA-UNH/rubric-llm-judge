@@ -434,7 +434,7 @@ def predict(clf: Pipeline,
                         llm='flan-t5-large',
                         llm_options={},
                         self_ratings=rel,
-                        prompt_type='DirectGrading',
+                        prompt_type='direct_grading',
                         prompt_info={
                             'prompt_class': 'exampp-llmjudge-labelling',
                             'is_self_rated': True,
