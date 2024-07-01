@@ -36,6 +36,7 @@ import matplotlib.pyplot as pl
 
 from exam_pp.data_model import *
 
+import os
 import logging
 import enum
 import pickle
@@ -86,7 +87,8 @@ def rating_histogram(queries: List[QueryWithFullParagraphList]
 
 
 def build_features(queries: List[QueryWithFullParagraphList],
-                   rels: Optional[Dict[Tuple[QueryId, DocId], int]]
+                   rels: Optional[Dict[Tuple[QueryId, DocId], int]],
+                   prompt_classes={'nuggets', 'questions', 'direct'},
                    ) -> Tuple[Dict[Tuple[QueryId, DocId], int], np.ndarray, Optional[np.ndarray]]:
     """
     Result: (queryDocMap, feature tensor, training vector)
@@ -103,6 +105,9 @@ def build_features(queries: List[QueryWithFullParagraphList],
     mean_rating: Dict[QuestionId, float]
     mean_rating = {qid: sum(n*r for r,n in ratings.items()) / sum(ratings.values())
                    for qid, ratings in hist.items() }
+
+    if os.environ['LABEL_PROMPTS']:
+        prompt_classes = set(os.environ['LABEL_PROMPTS'].split())
 
     # associate (query,doc) to row in the feature matrix X
     queryDocMap: Dict[Tuple[QueryId, DocId], int]
@@ -122,6 +127,23 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
         return f
 
+    PROMPT_CLASSES = {}
+    if 'nuggets' in prompt_classes:
+        PROMPT_CLASSES['NuggetSelfRatedPrompt'] = {0,1,2,3,4,5}
+    if 'questions' in prompt_classes:
+        PROMPT_CLASSES['QuestionSelfRatedUnanswerablePromptWithChoices'] = {0,1,2,3,4,5}
+    if 'direct' in prompt_classes:
+        PROMPT_CLASSES |= {
+            'FagB': {0,1},
+            'FagB_few': {0,1},
+            'HELM': {0,1},
+            'Sun': {0,1},
+            'Sun_few': {0,1},
+            'Thomas': {0,1,2},
+            }
+
+    logging.info(f'Using prompt classes {",".join(PROMPT_CLASSES.keys())}')
+
     for q in queries:
         para: FullParagraphData
         for para in q.paragraphs:
@@ -131,18 +153,6 @@ def build_features(queries: List[QueryWithFullParagraphList],
 
             feats: List[np.ndarray]
             feats = []
-
-            PROMPT_CLASSES = {
-                    'NuggetSelfRatedPrompt': {0,1,2,3,4,5},
-                    'QuestionSelfRatedUnanswerablePromptWithChoices': {0,1,2,3,4,5},
-                    # Direct rating prompts
-                    'FagB': {0,1},
-                    'FagB_few': {0,1},
-                    'HELM': {0,1},
-                    'Sun': {0,1},
-                    'Sun_few': {0,1},
-                    'Thomas': {0,1,2},
-                    }
 
             for pclass, valid_range in PROMPT_CLASSES.items():
                 gfilt = GradeFilter.noFilter()

@@ -4,6 +4,7 @@ set -e -x -o pipefail
 
 if [ -z "$CLASSIFIER" ]; then CLASSIFIER=LinearSVM; fi
 if [ -z "$RESTARTS" ]; then RESTARTS=1; fi
+if [ -z "$OUT" ]; then OUT=out; fi
 
 dataset="/home/ben/rubric-llm-judge/LLMJudge/data"
 judgement_dir="/home/dietz/jelly-home/peanut-jupyter/exampp/data/llmjudge"
@@ -19,8 +20,8 @@ CLASSIFIERS=(
     DecisionTree
     RandomForest
     MLP
-    LogRegCV
-    LogReg
+    #LogRegCV
+    #LogReg
     LinearSVM
     SVM
     HistGradientBoostedClassifier
@@ -28,7 +29,7 @@ CLASSIFIERS=(
 )
 
 model_dir() {
-    local dir="out/$CLASSIFIER"
+    local dir="$OUT/$CLASSIFIER"
     mkdir -p "$dir"
     printf "$dir"
 }
@@ -75,6 +76,33 @@ run_all() {
     for m in ${CLASSIFIERS[@]}; do
         CLASSIFIER=$m train || echo "$m failed"
     done
+}
+
+final_run() {
+    RESTARTS=5
+    export LABEL_PROMPTS
+
+    printf "Running $OUT dev..."
+    OUT="out-final/$NAME-$CLASSIFIER"
+    judgements="$judgement_dir/all-llmjudge-passages_dev.json.gz"
+    test_judgements="$judgement_dir/all-llmjudge-passages_test.json.gz"
+    (git rev-parse HEAD; train; predict) |& tee $(model_dir)/log-dev
+
+    printf "Running $OUT test..."
+    (git rev-parse HEAD; test) |& tee $(model_dir)/log-test
+
+    cp $(model_dir)/test.qrel submission/llm4eval_test_qrel_2024-all-$CLASSIFIER-$NAME.txt
+}
+
+final_runs() {
+    LABEL_PROMPTS="nuggets questions direct" NAME="all" CLASSIFIER=ExtraTrees final_run
+    LABEL_PROMPTS="nuggets questions direct" NAME="all" CLASSIFIER=RandomForest final_run
+    LABEL_PROMPTS="nuggets" NAME="nuggets" CLASSIFIER=ExtraTrees final_run
+    LABEL_PROMPTS="nuggets" NAME="nuggets" CLASSIFIER=RandomForest final_run
+    LABEL_PROMPTS="questions" NAME="questions" CLASSIFIER=ExtraTrees final_run
+    LABEL_PROMPTS="questions" NAME="questions" CLASSIFIER=RandomForest final_run
+    LABEL_PROMPTS="direct" NAME="direct" CLASSIFIER=ExtraTrees final_run
+    LABEL_PROMPTS="direct" NAME="direct" CLASSIFIER=RandomForest final_run
 }
 
 $@
