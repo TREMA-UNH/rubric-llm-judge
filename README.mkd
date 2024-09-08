@@ -19,6 +19,8 @@ Get the LLMJudge data (added as a git submodule):
 
 ## Usage
 
+Preparation:  create directory `./data/llmjudge`
+
 1. Convert LLMJudge data to input files for RUBRIC
 
     bash convert_llmjudge.sh 
