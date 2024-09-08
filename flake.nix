@@ -4,7 +4,8 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.dspy-nix.url = "git+https://git.smart-cactus.org/ben/dspy-nix";
-  inputs.exampp.url = "git+ssh://git@git.smart-cactus.org/ben/exampp.git";
+  # inputs.exampp.url = "git+ssh://git@git.smart-cactus.org/ben/exampp.git";
+  inputs.exampp.url = "git+https://github.com/laura-dietz/rubric-internal";
 
   outputs = inputs@{ self, nixpkgs, flake-utils, dspy-nix, exampp, ... }:
     flake-utils.lib.eachDefaultSystem (system: 
