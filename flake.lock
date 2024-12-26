@@ -183,17 +183,17 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1719783097,
-        "narHash": "sha256-vywOoUQuk7r/ix7QaZ13TvXhjKzNyT+wN1n0m+4PpeM=",
-        "ref": "refs/heads/master",
-        "rev": "0b690c629dba28d667612b27faa7e0cec51bc8ae",
-        "revCount": 245,
+        "lastModified": 1734916557,
+        "narHash": "sha256-ZEkmNTm1eOuVMdt1x8GvA/he/+83EdeAdJQN6znvRRE=",
+        "ref": "refs/heads/main",
+        "rev": "a4c6833e60663f89e9fa2cd667108e306b65db87",
+        "revCount": 305,
         "type": "git",
-        "url": "ssh://git@git.smart-cactus.org/ben/exampp.git"
+        "url": "https://github.com/laura-dietz/rubric-internal"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@git.smart-cactus.org/ben/exampp.git"
+        "url": "https://github.com/laura-dietz/rubric-internal"
       }
     },
     "flake-utils": {
