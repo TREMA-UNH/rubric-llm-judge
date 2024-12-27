@@ -25,7 +25,7 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
         return self.my_prompt_type
 
 
-    def prompt_template(self, context:str)->str:
+    def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
         return f'''Please assess how well the provided passage meets specific criteria in
 relation to the query. Use the following scoring scale (0-{self.max_valid_rating()}) for evaluation:
 0: Not relevant at all / No information provided.
@@ -54,6 +54,94 @@ Give the response in the following JSON format:
 
 
 
+
+
+@dataclass
+class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
+    my_prompt_type=NuggetPrompt.my_prompt_type
+
+    
+    # def __post_init__(self):
+    #     super().__post_init__()
+        
+    def prompt_id(self)->str:
+        return "aggregate"
+    
+    def prompt_type(self)->str:
+        return self.my_prompt_type
+
+
+    def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
+        grade_filter = GradeFilter()
+        grade_filter.prompt_class = "FourPrompts"
+        grade_filter.model_name=None
+        grade_filter.is_self_rated=None
+        grade_filter.min_self_rating=None
+        grade_filter.question_set=None
+        grade_filter.prompt_type=None
+
+        # TODO make sure these exist!
+        exactness_score = 0
+        topicality_score = 0
+        coverage_score = 0
+        contextual_fit_score = 0
+
+
+        grades = grade_filter.fetch_any(full_paragraph.exam_grades, full_paragraph.grades)
+        if len(grades)>0 and grades[0].self_ratings is not None:
+            grade_set = grades[0]
+            # for prompt_name, g in grade_set.answers:
+            for rating in grade_set.self_ratings:
+                if rating.get_id == "Exactness":
+                    exactness_score = rating.self_rating
+                if rating.get_id == "Coverage":
+                    coverage_score = rating.self_rating
+                if rating.get_id == "Topicality":
+                    topicality_score = rating.self_rating
+                if rating.get_id == "Contextual Fit":
+                    contextual_fit_score = rating.self_rating
+
+
+        return f'''You are a search quality rater evaluating the relevance of passages. Given a
+query and passage, you must provide a score on an integer scale of 0 to 3
+with the following meanings:
+3 = Perfectly relevant: The passage is dedicated to the query and contains
+the exact answer.
+2 = Highly relevant: The passage has some answer for the query, but the
+answer may be a bit unclear, or hidden amongst extraneous information.
+1 = Related: The passage seems related to the query but does not answer it.
+0 = Irrelevant: The passage has nothing to do with the query.
+Assume that you are writing an answer to the query. If the passage seems to
+be related to the query but does not include any answer to the query, mark
+it 1. If you would use any of the information contained in the passage in
+such an answer, mark it 2. If the passage is primarily about the query, or
+contains vital information about the topic, mark it 3. Otherwise, mark it 0.
+Prompt:
+Please rate how the given passage is relevant to the query based on the
+given scores. The output must be only a score that indicates how relevant
+they are.
+Query: {self.query_text}
+Passage: {context}
+Exactness: {exactness_score}
+Topicality: {topicality_score}
+Coverage: {coverage_score}
+Contextual Fit: {contextual_fit_score}
+Score:
+'''
+    def max_valid_rating(self)->int:
+        return 3
+
+
+    def gpt_json_prompt(self) ->Tuple[str,str]:
+        json_instruction= r'''
+Give the response in the following JSON format:
+```json
+{ "score": int }
+```'''
+        return (json_instruction, "score")
+
+
+
 def create_grading_prompts(query_id:str, query_text:str)->List[FourPrompts]:
     return [ FourPrompts(query_id=query_id, query_text=query_text, criterion_name="Exactness", criterion_desc="How precisely does the passage answer the query.", facet_id=None, facet_text=None)
             , FourPrompts(query_id=query_id, query_text=query_text, criterion_name="Coverage", criterion_desc="How much of the passage is dedicated to discussing the query and its related topics.", facet_id=None, facet_text=None)
@@ -61,12 +149,11 @@ def create_grading_prompts(query_id:str, query_text:str)->List[FourPrompts]:
             , FourPrompts(query_id=query_id, query_text=query_text, criterion_name="Contextual Fit", criterion_desc="Does the passage provide relevant background or context.", facet_id=None, facet_text=None)
             ]
 
-def create_agggregation_prompts(query_id:str, exam_grades:ExamGrades)-> List[FourAggregationPrompt]:
-    return [FourAggregationPrompt(query_id=query_id ,exam_grades = exam_grades)]
-
+def create_agggregation_prompts(query_id:str, query_text:str)-> List[FourAggregationPrompt]:
+    return [FourAggregationPrompt(query_id=query_id, query_text=query_text, facet_id=None, facet_text=None)]
 
 def get_prompt_classes()-> List[str]:
-    return ["FourPrompts"]
+    return ["FourPrompts","FourAggregationPrompt"]
 
 
 
@@ -159,12 +246,11 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
 
 
     question_set:Dict[str,List[Prompt]]
+    queries=json_query_loader(query_json=args.query_path)
     if args.prompt_class == "FourPromptPrompt":
-        queries=json_query_loader(query_json=args.query_path)
         question_set = {query_id: create_grading_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
-    if args.prompt_class == "FourAggregationPrompt":
-        
-        question_set = {query_id: create_agggregation_prompts(query_id=query_id, exam_grades=exam_grades) for query_id}
+    elif args.prompt_class == "FourAggregationPrompt":
+        question_set = {query_id: create_agggregation_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
 
 
 

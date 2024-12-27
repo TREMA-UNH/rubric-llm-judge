@@ -15,11 +15,35 @@
         mkShell = target: (dspy-nix.lib.${system}.mkShell {
           inherit target;
           pythonOverrides = [ exampp.lib.${system}.pythonOverrides ];
-          packages = ps: [ ps.exampp ps.scikit-learn ps.mypy ps.pylatex ];
+          packages = ps: [ ps.exampp ps.scikit-learn ps.mypy ps.pylatex];
         });
 
+        pythonOverrides = pkgs.lib.composeOverlays
+          exampp.lib.${system}.pythonOverrides
+          (self: super: {
+            rubric_llm_judge = self.buildPythonPackage {
+              name = "rubric_llm_judge";
+              src = ./.;
+              format = "pyproject";
+              propagatedBuildInputs = with self; [ 
+                setuptools
+                pydantic
+                exampp
+              ];
+            };
+          });
+
       in {
-        packages.exampp = (pkgs.python3.override {packageOverrides = exampp.lib.${system}.pythonOverrides;}).pkgs.exampp;
+        lib.pythonOverrides = pythonOverrides;
+
+        packages.exampp = (pkgs.python3.override {
+          packageOverrides = exampp.lib.${system}.pythonOverrides;
+        }).pkgs.exampp;
+
+        packages.rubric_llm_judge = (pkgs.python3.override {
+          packageOverrides = pythonOverrides;
+        }).pkgs.rubric_llm_judge;
+
         devShells.default = self.outputs.devShells.${system}.cuda;
         devShells.cpu = mkShell "cpu";
         devShells.rocm = mkShell "rocm";

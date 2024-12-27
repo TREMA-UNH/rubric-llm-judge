@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rubric_llm_judge"
+version = "0.1.0"
+description = "RUBRIC experiments on LLMJudge challenge data"
+authors = ["Laura Dietz <dietz@cs.unh.edu>", "Ben Gamari <ben@smart-cactus.org>", "Naghmeh Farzi <Naghmeh.Farzi@unh.edu>"]
+requires-python = ">= 3.8"
+dependencies = [
+    "pydantic ~= 2.6",
+    "exam_pp ~= 0.1.2"
+]
+
+
+[tool.setuptools]
+packages = ["rubric_llm_judge"]
+
+
+
+[tool.poetry.dev-dependencies]
+mypy = "*"
+jedi = "*"

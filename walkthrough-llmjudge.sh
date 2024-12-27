@@ -96,7 +96,7 @@ for subset in dev test; do
 	final=$withrateextract
 	# final="Thomas-Sun_few-Sun-HELM-FagB_few-FagB-questions-explain--questions-rate--nuggets-explain--nuggets-rate--all-trecDL2020-qrels-runs-with-text.jsonl.gz"
 
-	echo "Graded: $final"
+	echo "Graded: $final" 
 done
 
 #### Phase 3: Manual verification and Supervision

@@ -34,3 +34,11 @@ Preparation:  create directory `./data/llmjudge`
 
     bash predict_llmjudge.sh
 
+
+# Internal Notes
+
+To bump the  rubric autograder workbench package `exam_pp` to the latest version, call
+
+```
+nix flake lock --update-input exampp
+```
