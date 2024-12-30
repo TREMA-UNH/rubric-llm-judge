@@ -14,7 +14,7 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
     criterion_desc:str
     my_prompt_type=NuggetPrompt.my_prompt_type
     unanswerable_matcher2=UnanswerableMatcher2(unanswerable_expressions=set())
-    my_score_interpreter = SelfRaterStrict(unanswerable_matcher2, max_rating=3)
+    self_rater = SelfRaterTolerant(unanswerable_matcher2, max_rating=3)
 
 
     
@@ -38,15 +38,18 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
                 , "check_unanswerable": False
                 , "check_answer_key": True
                 , "is_self_rated":self.has_rating()
+                , "rating_extractor":self.self_rater.__class__.__name__
                 , "naghmehs_attribute":"Message to self"
                 }
     def prompt_style(self)->str:
         return  "Relevance Criteria"
     
 
-    # def check_answer_rating(self,answer:str)->int:
-    #     return super.self_rater.check_answer_rating(answer)
+    def check_answer_rating(self,answer:str)->int:
+        return self.self_rater.check_answer_rating(answer)
     
+    def check_answer(self, answer):
+        return self.check_answer_rating(answer=answer)>0
 
 
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
@@ -56,14 +59,14 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
           '''
 
         return f'''Please assess how well the provided passage meets specific criteria in
-relation to the query. Use the following scoring scale (0-{self.max_valid_rating()}) for evaluation:
+relation to the query. Use the following scoring scale (0-3) for evaluation:
 0: Not relevant at all / No information provided.
 1: Marginally relevant / Partially addresses the criterion.
 2: Fairly relevant / Adequately addresses the criterion.
-{self.max_valid_rating}: Highly relevant / Fully satisfies the criterion.
+3: Highly relevant / Fully satisfies the criterion.
 
 Please rate how well the given passage meets the {self.criterion_name} criterion in
-relation to the query. The output should be a single score (0-{self.max_valid_rating}) indicating
+relation to the query. The output should be a single score (0-3) indicating
 {self.criterion_desc}
 Query: {self.query_text}
 Passage: {context}
@@ -276,7 +279,8 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
 
     parser.add_argument('--restart-paragraphs-file', type=str, metavar='exam-xxx.jsonl.gz', help='Restart logic: Input file name with partial exam grade annotations that we want to copy from. Copies while queries are defined (unless --restart-from-query is set)')
     parser.add_argument('--restart-from-query', type=str, metavar='QUERY_ID', help='Restart logic: Once we encounter Query Id, we stop copying and start re-running the pipeline (Must also set --restart-paragraphs-file)')
- 
+    parser.add_argument('-k','--keep-going-on-llm-parse-error', action='store_true', help="Keep going even when parsing of LLM-responses fail. Errors will be logged in ExamGrades/Grades object, but the program will not stop with a raised LlmResponseError")
+
     parser.add_argument('--help-schema', action='store_true', help="Additional info on required JSON.GZ input format")
 
 
@@ -310,6 +314,7 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
            , max_paragraphs = args.max_paragraphs
            # Restart logic
            , restart_previous_paragraph_file=args.restart_paragraphs_file, restart_from_query=args.restart_from_query
+           , keep_going_on_llm_parse_error=args.keep_going_on_llm_parse_error
            )
 
 if __name__ == "__main__":
