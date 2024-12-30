@@ -13,19 +13,48 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
     criterion_name:str
     criterion_desc:str
     my_prompt_type=NuggetPrompt.my_prompt_type
+    unanswerable_matcher2=UnanswerableMatcher2(unanswerable_expressions=set())
+    my_score_interpreter = SelfRaterStrict(unanswerable_matcher2, max_rating=3)
+
 
     
     # def __post_init__(self):
     #     super().__post_init__()
         
+    
     def prompt_id(self)->str:
+        '''Akin to question_id in RUBRIC, we use the criterion_name, so we can access it later'''
         return self.criterion_name
     
     def prompt_type(self)->str:
         return self.my_prompt_type
 
 
+    def prompt_info(self, old_prompt_info:Optional[Dict[str,Any]]=None)-> Dict[str, Any]:
+        '''Mostly for information only, but you can also to send messages from one Grading Prompt phase to the next'''
+        return {"prompt_class": self.__class__.__name__
+                ,"prompt_style": self.prompt_style()
+                , "context_first": False
+                , "check_unanswerable": False
+                , "check_answer_key": True
+                , "is_self_rated":self.has_rating()
+                , "naghmehs_attribute":"Message to self"
+                }
+    def prompt_style(self)->str:
+        return  "Relevance Criteria"
+    
+
+    # def check_answer_rating(self,answer:str)->int:
+    #     return super.self_rater.check_answer_rating(answer)
+    
+
+
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
+        '''Prompt that will be sent to the LLM.
+          can access just the text of the paragraph as `context` (preferred)
+          or can access anything that is stored in the `FullParagraphData` object (including judgments, other prompt results, prompt infos,markup of paragraph)
+          '''
+
         return f'''Please assess how well the provided passage meets specific criteria in
 relation to the query. Use the following scoring scale (0-{self.max_valid_rating()}) for evaluation:
 0: Not relevant at all / No information provided.
@@ -71,6 +100,19 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
         return self.my_prompt_type
 
 
+    def prompt_info(self, old_prompt_info:Optional[Dict[str,Any]]=None)-> Dict[str, Any]:
+        return {"prompt_class": self.__class__.__name__
+                ,"prompt_style": self.prompt_style()
+                , "context_first": False
+                , "check_unanswerable": False
+                , "check_answer_key": True
+                , "is_self_rated":self.has_rating()
+                }
+    def prompt_style(self)->str:
+        return  "Prompt to aggregate scores"
+    
+
+
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
         grade_filter = GradeFilter()
         grade_filter.prompt_class = "FourPrompts"
@@ -88,6 +130,7 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
 
 
         grades = grade_filter.fetch_any(full_paragraph.exam_grades, full_paragraph.grades)
+
         if len(grades)>0 and grades[0].self_ratings is not None:
             grade_set = grades[0]
             # for prompt_name, g in grade_set.answers:
