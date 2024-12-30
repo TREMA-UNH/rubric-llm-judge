@@ -315,6 +315,9 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
            # Restart logic
            , restart_previous_paragraph_file=args.restart_paragraphs_file, restart_from_query=args.restart_from_query
            , keep_going_on_llm_parse_error=args.keep_going_on_llm_parse_error
+           , system_message="You are a helpful assistant"
+           # additional kwargs are passed into the chat completions API or HF pipeline
+           , temperature=0.1
            )
 
 if __name__ == "__main__":
