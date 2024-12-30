@@ -247,7 +247,7 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
 
     question_set:Dict[str,List[Prompt]]
     queries=json_query_loader(query_json=args.query_path)
-    if args.prompt_class == "FourPromptPrompt":
+    if args.prompt_class == "FourPrompts":
         question_set = {query_id: create_grading_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
     elif args.prompt_class == "FourAggregationPrompt":
         question_set = {query_id: create_agggregation_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
