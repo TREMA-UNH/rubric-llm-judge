@@ -58,20 +58,10 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
           or can access anything that is stored in the `FullParagraphData` object (including judgments, other prompt results, prompt infos,markup of paragraph)
           '''
 
-        return f'''Please assess how well the provided passage meets specific criteria in
-relation to the query. Use the following scoring scale (0-3) for evaluation:
-0: Not relevant at all / No information provided.
-1: Marginally relevant / Partially addresses the criterion.
-2: Fairly relevant / Adequately addresses the criterion.
-3: Highly relevant / Fully satisfies the criterion.
-
-Please rate how well the given passage meets the {self.criterion_name} criterion in
-relation to the query. The output should be a single score (0-3) indicating
-{self.criterion_desc}
-Query: {self.query_text}
-Passage: {context}
-Score:
-'''
+        return f'''Please rate how well the given passage meets the {self.criterion_name} criterion in relation to the query. The output should be a single score (0-3) indicating {self.criterion_desc}.
+    Query: {self.query_text}
+    Passage: {context}
+    Score:'''
     def max_valid_rating(self)->int:
         return 3
 
@@ -148,32 +138,15 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
                     contextual_fit_score = rating.self_rating
 
 
-        return f'''You are a search quality rater evaluating the relevance of passages. Given a
-query and passage, you must provide a score on an integer scale of 0 to 3
-with the following meanings:
-3 = Perfectly relevant: The passage is dedicated to the query and contains
-the exact answer.
-2 = Highly relevant: The passage has some answer for the query, but the
-answer may be a bit unclear, or hidden amongst extraneous information.
-1 = Related: The passage seems related to the query but does not answer it.
-0 = Irrelevant: The passage has nothing to do with the query.
-Assume that you are writing an answer to the query. If the passage seems to
-be related to the query but does not include any answer to the query, mark
-it 1. If you would use any of the information contained in the passage in
-such an answer, mark it 2. If the passage is primarily about the query, or
-contains vital information about the topic, mark it 3. Otherwise, mark it 0.
-Prompt:
-Please rate how the given passage is relevant to the query based on the
-given scores. The output must be only a score that indicates how relevant
-they are.
-Query: {self.query_text}
-Passage: {context}
-Exactness: {exactness_score}
-Topicality: {topicality_score}
-Coverage: {coverage_score}
-Contextual Fit: {contextual_fit_score}
-Score:
-'''
+        return f'''Please rate how the given passage is relevant to the query based on the given scores. The output must be only a score that indicates how relevant they are.
+    Query: {self.query_text}
+    Passage: {context}
+    Exactness: {exactness_score}
+    Topicality: {topicality_score}
+    Coverage: {coverage_score}
+    Contextual Fit: {contextual_fit_score}
+    Score:
+    '''
     def max_valid_rating(self)->int:
         return 3
 
@@ -296,9 +269,20 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
     queries=json_query_loader(query_json=args.query_path)
     if args.prompt_class == "FourPrompts":
         question_set = {query_id: create_grading_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
+        system_message = '''Please assess how well the provided passage meets specific criteria in relation to the query. Use the following scoring scale (0-3) for evaluation:
+        0: Not relevant at all / No information provided.
+        1: Marginally relevant / Partially addresses the criterion.
+        2: Fairly relevant / Adequately addresses the criterion.
+        3: Highly relevant / Fully satisfies the criterion.'''
     elif args.prompt_class == "FourAggregationPrompt":
         question_set = {query_id: create_agggregation_prompts(query_id=query_id, query_text=query_text) for query_id, query_text in queries.items() }
-
+        system_message='''You are a search quality rater evaluating the relevance of passages. Given a query and passage, you must provide a score on an integer scale of 0 to 3 with the following meanings:
+        3 = Perfectly relevant: The passage is dedicated to the query and contains the exact answer.
+        2 = Highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information.
+        1 = Related: The passage seems related to the query but does not answer it.
+        0 = Irrelevant: The passage has nothing to do with the query.
+        Assume that you are writing an answer to the query. If the passage seems to be related to the query but does not include any answer to the query, mark it 1. 
+        If you would use any of the information contained in the passage in such an answer, mark it 2. If the passage is primarily about the query, or contains vital information about the topic, mark it 3. Otherwise, mark it 0.'''
 
 
 
@@ -315,7 +299,7 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
            # Restart logic
            , restart_previous_paragraph_file=args.restart_paragraphs_file, restart_from_query=args.restart_from_query
            , keep_going_on_llm_parse_error=args.keep_going_on_llm_parse_error
-           , system_message="You are a helpful assistant"
+           , system_message=system_message
            # additional kwargs are passed into the chat completions API or HF pipeline
            , temperature=0.1
            )
