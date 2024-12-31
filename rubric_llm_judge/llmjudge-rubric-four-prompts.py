@@ -39,7 +39,6 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
                 , "check_answer_key": True
                 , "is_self_rated":self.has_rating()
                 , "rating_extractor":self.self_rater.__class__.__name__
-                , "naghmehs_attribute":"Message to self"
                 }
     def prompt_style(self)->str:
         return  "Relevance Criteria"
@@ -124,7 +123,11 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
 
         grades = grade_filter.fetch_any(full_paragraph.exam_grades, full_paragraph.grades)
 
-        if len(grades)>0 and grades[0].self_ratings is not None:
+        if len(grades)==0 or grades[0].self_ratings is None:
+            raise RuntimeError("Can't aggregate exam grades without a 'FourPrompts' grading annotations.")
+
+        #if len(grades)>0 and grades[0].self_ratings is not None:
+        else:
             grade_set = grades[0]
             # for prompt_name, g in grade_set.answers:
             for rating in grade_set.self_ratings:
@@ -138,8 +141,8 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
                     contextual_fit_score = rating.self_rating
 
 
-        return f'''Please rate how the given passage is relevant to the query based on the given scores. The output must be only a score that indicates how relevant they are.
-    Query: {self.query_text}
+            return f'''Please rate how the given passage is relevant to the query based on the given scores. The output must be only a score that indicates how relevant they are.
+        Query: {self.query_text}
     Passage: {context}
     Exactness: {exactness_score}
     Topicality: {topicality_score}
