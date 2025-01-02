@@ -1,0 +1,7 @@
+.direnv
+.mypy_cache
+.vscode
+cache
+__pycache__
+
+data/
