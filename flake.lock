@@ -32,56 +32,7 @@
         "type": "github"
       }
     },
-    "bitsandbytes-rocm_2": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1702726432,
-        "narHash": "sha256-TXDub6lBEYVToQnXmaNnaiyGy8CohfEgD/6zRE+cBvI=",
-        "owner": "arlo-phoenix",
-        "repo": "bitsandbytes-rocm-5.6",
-        "rev": "62353b0200b8557026c176e74ac48b84b953a854",
-        "type": "github"
-      },
-      "original": {
-        "owner": "arlo-phoenix",
-        "repo": "bitsandbytes-rocm-5.6",
-        "type": "github"
-      }
-    },
-    "bitsandbytes_2": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1702312854,
-        "narHash": "sha256-Llrojq1Td1cwVbc/nYmx+/+nrcHB3NAdAcKsZHQ0w7o=",
-        "owner": "TimDettmers",
-        "repo": "bitsandbytes",
-        "rev": "8a45bfa51c4193e64b1de4424c9af05344f74173",
-        "type": "github"
-      },
-      "original": {
-        "owner": "TimDettmers",
-        "repo": "bitsandbytes",
-        "type": "github"
-      }
-    },
     "diffusers": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1701284315,
-        "narHash": "sha256-ccWF8hQzPhFY/kqRum2tbanI+cQiT25MmvPZN+hGadc=",
-        "owner": "huggingface",
-        "repo": "diffusers",
-        "rev": "76c645d3a641c879384afcb43496f0b7db8cc5cb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "huggingface",
-        "ref": "v0.24.0",
-        "repo": "diffusers",
-        "type": "github"
-      }
-    },
-    "diffusers_2": {
       "flake": false,
       "locked": {
         "lastModified": 1701284315,
@@ -137,57 +88,18 @@
         "url": "https://git.smart-cactus.org/ben/dspy-nix"
       }
     },
-    "dspy-nix_2": {
+    "exampp": {
       "inputs": {
-        "bitsandbytes": "bitsandbytes_2",
-        "bitsandbytes-rocm": "bitsandbytes-rocm_2",
-        "diffusers": "diffusers_2",
-        "dspy": "dspy_2",
+        "dspy-nix": "dspy-nix",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1730591184,
-        "narHash": "sha256-Mo14g8d3Lsb1Ksa9zgQJe5+gF7fTh+Y5VFrvRYiFYXA=",
-        "ref": "refs/heads/master",
-        "rev": "c15bcfce6bbcdc0b5a98b9753334573b5fe87777",
-        "revCount": 46,
-        "type": "git",
-        "url": "https://git.smart-cactus.org/ben/dspy-nix"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.smart-cactus.org/ben/dspy-nix"
-      }
-    },
-    "dspy_2": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1702569302,
-        "narHash": "sha256-KuyNhHtcSoRVnUtAbgeVAtyAASni1wsmVTYsJ2+0Fa0=",
-        "owner": "stanfordnlp",
-        "repo": "dspy",
-        "rev": "f7449977e80159931731f085945ecd0b0f3aea49",
-        "type": "github"
-      },
-      "original": {
-        "owner": "stanfordnlp",
-        "repo": "dspy",
-        "type": "github"
-      }
-    },
-    "exampp": {
-      "inputs": {
-        "dspy-nix": "dspy-nix_2",
-        "flake-utils": "flake-utils_3",
-        "nixpkgs": "nixpkgs_3"
-      },
-      "locked": {
-        "lastModified": 1735870536,
-        "narHash": "sha256-6rXUbNbggRy1paIKnaKHTh34goaGWRWiQIozlXJqXdo=",
+        "lastModified": 1735943008,
+        "narHash": "sha256-lD1r4QMcKiDcGxuvX85V7MQx3zPnbD4ldg+gJQwUc/M=",
         "ref": "refs/heads/main",
-        "rev": "530a916c25f3fa64aba0020ce1eb24a3020ced15",
-        "revCount": 335,
+        "rev": "9d91d64bfd51c8030b2c73f0759230d3ae5a1a33",
+        "revCount": 336,
         "type": "git",
         "url": "https://github.com/laura-dietz/rubric-internal"
       },
@@ -237,24 +149,6 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1701680307,
-        "narHash": "sha256-kAuep2h5ajznlPMD9rnQyffWG8EM/C73lejGofXvdM8=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "4022d587cbbfd70fe950c1e2083a02621806a725",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_4": {
-      "inputs": {
-        "systems": "systems_4"
-      },
-      "locked": {
         "lastModified": 1710146030,
         "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
         "owner": "numtide",
@@ -285,15 +179,16 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1728066430,
-        "narHash": "sha256-uU5KJrDVodx72SaF9lBxSVMr5nqXLrzqCyNXEdXJ62U=",
+        "lastModified": 1719426051,
+        "narHash": "sha256-yJL9VYQhaRM7xs0M867ZFxwaONB9T2Q4LnGo1WovuR4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "bf68255aa0628199c565d6a61bf575ec79c02c3c",
+        "rev": "89c49874fb15f4124bf71ca5f42a04f2ee5825fd",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
+        "ref": "nixos-24.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -314,28 +209,15 @@
         "type": "github"
       }
     },
-    "nixpkgs_4": {
-      "locked": {
-        "lastModified": 1719426051,
-        "narHash": "sha256-yJL9VYQhaRM7xs0M867ZFxwaONB9T2Q4LnGo1WovuR4=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "89c49874fb15f4124bf71ca5f42a04f2ee5825fd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-24.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
-        "dspy-nix": "dspy-nix",
+        "dspy-nix": [
+          "exampp",
+          "dspy-nix"
+        ],
         "exampp": "exampp",
-        "flake-utils": "flake-utils_4",
-        "nixpkgs": "nixpkgs_4"
+        "flake-utils": "flake-utils_3",
+        "nixpkgs": "nixpkgs_3"
       }
     },
     "systems": {
@@ -369,21 +251,6 @@
       }
     },
     "systems_3": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_4": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
