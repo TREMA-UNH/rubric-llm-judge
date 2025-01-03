@@ -183,11 +183,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1735861394,
-        "narHash": "sha256-9S6xTEUJ8hGURF2JJhR+ew/JKUcDod4I7lQWw81d47s=",
+        "lastModified": 1735863568,
+        "narHash": "sha256-NmOBRoSNCAr8PAOgK5c5YuHzZPMxWH1ONDZSUY5Lgyg=",
         "ref": "refs/heads/main",
-        "rev": "825249c9827f2dc447d1d369318fc7eb352fb42f",
-        "revCount": 325,
+        "rev": "075871ac9e24460d5556c059016e8aa22f896bd3",
+        "revCount": 331,
         "type": "git",
         "url": "https://github.com/laura-dietz/rubric-internal"
       },
