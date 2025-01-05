@@ -106,7 +106,7 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
 
 
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
-        grade_filter = GradeFilter()
+        grade_filter = GradeFilter.noFilter()
         grade_filter.prompt_class = "FourPrompts"
         grade_filter.model_name=None
         grade_filter.is_self_rated=None
