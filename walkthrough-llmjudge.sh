@@ -26,23 +26,30 @@ set -eo pipefail
 #
 # llmjudge-nuggets.jsonl.gz Generated test nuggets
 
+subset="dev"
 
 
 echo -e "\n\n\nGenerate llmjudge Nuggets"
-
-#python -O -m exam_pp.question_generation -q data/llmjudge/llmjudge-queries.json -o data/llmjudge/llmjudge-nuggets.jsonl.gz --use-nuggets --test-collection llmjudge --description "A new set of generated nuggets for llmjudge"
-
+# for subset in dev test; do
+# 	python -O -m exam_pp.question_generation -q data/llmjudge/llmjudge_queries_${subset}.jsonl -o data/llmjudge/llmjudge-nuggets_${subset}.jsonl.gz --use-nuggets --test-collection llmjudge_${subset} --description "A new set of generated nuggets for llmjudge ${subset}"
+	echo ""
+# done
+	
 echo -e "\n\n\Generate llmjudge Questions"
 
-# python -O -m exam_pp.question_generation -q data/llmjudge/llmjudge_queries_dev.jsonl -o data/llmjudge/llmjudge-questions_dev.jsonl.gz --test-collection llmjudge_dev --description "A new set of generated questions for llmjudge dev set"
+for subset in dev test; do
+# 	python -O -m exam_pp.question_generation -q data/llmjudge/llmjudge_queries_${subset}.jsonl -o data/llmjudge/llmjudge-questions_${subset}.jsonl.gz --test-collection llmjudge_${subset} --description "A new set of generated questions for llmjudge ${subset} set"
+	echo ""
+done
 
 
-# python -O -m exam_pp.question_generation -q data/llmjudge/llmjudge_queries_test.jsonl -o data/llmjudge/llmjudge-questions_test.jsonl.gz --test-collection llmjudge_test --description "A new set of generated questions for llmjudge test set"
+
 
 echo -e "\n\n\nself-rated llmjudge nuggets"
 
-# subset="dev"
-for subset in dev test; do
+subset="dev"
+
+# for subset in dev test; do
 	ungraded="llmjudge-passages_${subset}.json.gz"
 	# also do it for the test set.
 
@@ -65,18 +72,25 @@ for subset in dev test; do
 	echo "Grading ${ungraded}. Number of queries:"
 	zcat data/llmjudge/$ungraded | wc -l
 
-	# withrate="nuggets-rate--all-${ungraded}"
-	# withrateextract="nuggets-explain--${withrate}"
+	withrate="nuggets-rate--all-${ungraded}"
+	withrateextract="nuggets-explain--${withrate}"
 
-	# grade nuggets
+	##
+	# Nuggets
+	#
 
-# 	python -O -m exam_pp.exam_grading data/llmjudge/$ungraded -o data/llmjudge/$withrate --model-pipeline text2text --model-name google/flan-t5-large --prompt-class NuggetSelfRatedPrompt --question-path data/llmjudge/llmjudge-nuggets.jsonl.gz  --question-type question-bank --use-nuggets  
 
-	# echo -e "\n\n\ Explained llmjudge Nuggets"
+	#python -O -m exam_pp.exam_grading data/llmjudge/$ungraded -o data/llmjudge/$withrate --model-pipeline text2text --model-name google/flan-t5-large --prompt-class NuggetSelfRatedPrompt --question-path data/llmjudge/llmjudge-nuggets_${subset}.jsonl.gz  --question-type question-bank --use-nuggets 
 
-# 	python -O -m exam_pp.exam_grading data/llmjudge/$withrate  -o data/llmjudge/$withrateextract --model-pipeline text2text --model-name google/flan-t5-large --prompt-class NuggetExtractionPrompt --question-path data/llmjudge/llmjudge-nuggets.jsonl.gz  --question-type question-bank --use-nuggets  
+	echo -e "\n\n\ Explained llmjudge Nuggets"
 
-	# grade questions
+
+	#python -O -m exam_pp.exam_grading data/llmjudge/$withrate  -o data/llmjudge/$withrateextract --model-pipeline text2text --model-name google/flan-t5-large --prompt-class NuggetExtractionPrompt --question-path data/llmjudge/llmjudge-nuggets_${subset}.jsonl.gz  --question-type question-bank --use-nuggets 
+
+	##
+	# Questions
+	#
+
 
 	echo -e "\n\n\ Rated llmjudge Questions"
 	# ungraded="$withrateextract"
@@ -94,10 +108,37 @@ for subset in dev test; do
 
 
 	final=$withrateextract
-	# final="Thomas-Sun_few-Sun-HELM-FagB_few-FagB-questions-explain--questions-rate--nuggets-explain--nuggets-rate--all-trecDL2020-qrels-runs-with-text.jsonl.gz"
+	
+	
 
-	echo "Graded: $final" 
+	##
+	# Direct Grading
+	#
+	in="$ungraded"
+	for direct in FagB Sun FagB_few HELM Sun_few Thomas; do
+		echo "direct grading $direct"
+
+		out="$direct-$in"
+# 		python -O -m exam_pp.exam_grading data/llmjudge/$in  -o data/llmjudge/$out --model-pipeline text2text --model-name google/flan-t5-large --prompt-class "$direct" --question-path data/llmjudge/llmjudge-questions_${subset}.jsonl.gz  --question-type question-bank 
+
+
+		in="$out"
+		final="$out"
+	done
+	directfinal="Thomas-Sun_few-Sun-HELM-FagB_few-FagB-questions-explain--questions-rate--nuggets-explain--nuggets-rate--all-trecDL2020-qrels-runs-with-text.jsonl.gz"
+
+	echo "Graded: $final"
+	
+	
+	
+# Merge different grades file into one that contains them all
+
+for subset in dev test; do
+# 	python -O -m exam_pp.data_model merge data/llmjudge/questions-explain--questions-rate--llmjudge-passages_${subset}.json.gz  data/llmjudge/nuggets-explain--nuggets-rate--all-llmjudge-passages_${subset}.json.gz data/llmjudge/Thomas-Sun_few-HELM-FagB_few-Sun-FagB-llmjudge-passages_${subset}.json.gz -o data/llmjudge/all-llmjudge-passages_${subset}.json.gz
 done
+
+
+# done
 
 #### Phase 3: Manual verification and Supervision
 # We demonstrate how we support humans conducting a manual supervision of the process
@@ -117,42 +158,6 @@ done
 
 
 #### Phase 4: Evaluation
-#
-# We demonstrate both the Autograder-qrels  and Autograder-cover evaluation approaches
-# Both require to select the grades to be used via --model and --prompt_class
-# Here we use --model google/flan-t5-large
-# and as --prompt_class either QuestionSelfRatedUnanswerablePromptWithChoices or NuggetSelfRatedPrompt.
-#
-# Alternatively, for test banks with exam questions that have known correct answers (e.g. TQA for CAR-y3), 
-# the prompt class QuestionCompleteConcisePromptWithAnswerKey2 can be used to assess answerability.
-#
-# The files produced in this phase are:
-#
-# llmjudge-autograde-qrels-\$promptclass-minrating-4.solo.qrels:  Exported Qrel file treating passages with self-ratings >=4 
-#
-# llmjudge-autograde-qrels-leaderboard-\$promptclass-minrating-4.solo.tsv:  Leaderboard produced with 
-#        trec_eval using the exported Qrel file
-#
-# llmjudge-autograde-cover-leaderboard-\$promptclass-minrating-4.solo.tsv: Leaderboads produced with Autograde Cover treating \
-# 	test nuggets/questions as answered when any passage obtains a self-ratings >= 4
-#
-#
-#
-#
-for promptclass in  QuestionSelfRatedUnanswerablePromptWithChoices ; do  #NuggetSelfRatedPrompt
-	echo $promptclass
-
-	for minrating in 3 4 5; do
-		echo ""
-		# python -O -m exam_pp.exam_evaluation data/llmjudge/$final --question-set question-bank --prompt-class $promptclass --min-self-rating $minrating --leaderboard-out data/llmjudge/llmjudge-autograde-cover-leaderboard-$promptclass-minrating-$minrating.solo.$ungraded.tsv 
-
-		# N.B. requires TREC-llmjudge runs to be populated in data/llmjudge/llmjudgeruns
-		# python -O -m exam_pp.exam_evaluation data/llmjudge/$final --question-set question-bank --prompt-class $promptclass -q data/llmjudge/llmjudge-autograde-qrels-leaderboard-$promptclass-minrating-$minrating.solo.$ungraded.qrels  --min-self-rating $minrating --qrel-leaderboard-out data/llmjudge/llmjudge-autograde-qrels-$promptclass-minrating-$minrating.solo.$ungraded.tsv --run-dir data/llmjudge/llmjudgeruns 
-        
-		# Since generative IR systems will not share any passages, we represent them as special run files
-		#python -O -m exam_pp.exam_evaluation data/llmjudge/$final --question-set question-bank --prompt-class $promptclass -q data/llmjudge/llmjudge-autograde-qrels-leaderboard-$promptclass-minrating-$minrating.solo.$ungraded.qrels  --min-self-rating $minrating --qrel-leaderboard-out data/llmjudge/llmjudge-autograde-qrels-$promptclass-minrating-$minrating.solo.$ungraded.gen.tsv --run-dir data/llmjudge/llmjudgegen-runs 
-	done
-done
 
 #### Additional Analyses
 # When manual judgments or official leaderboards are available, these can be used for additional analyses and manual oversight
@@ -176,23 +181,35 @@ done
 
 final="questions-explain--questions-rate--llmjudge-passages_dev.json.gz"
 
+directfinal="Thomas-Sun_few-HELM-FagB_few-Sun-FagB-llmjudge-passages_dev.json.gz"
+
 for promptclass in  QuestionSelfRatedUnanswerablePromptWithChoices; do
 	echo $promptclass
 
-	for minrating in 3 4 5; do
-		# autograde-qrels
-		# qrel leaderboard correlation
-		# N.B. requires TREC-llmjudge runs to be populated in data/llmjudge/llmjudgeruns
-		#python -O -m exam_pp.exam_post_pipeline data/llmjudge/$final  --question-set question-bank --prompt-class $promptclass  --min-relevant-judgment 2 --use-ratings --min-trec-eval-level ${minrating} -q data/llmjudge/llmjudge-exam-$promptclass.qrel --qrel-leaderboard-out data/llmjudge/llmjudge-autograde-qrels-leaderboard-$promptclass-minlevel-$minrating.correlation.tsv --run-dir data/llmjudge/llmjudgeruns --official-leaderboard data/llmjudge/official_llmjudge_leaderboard.json 
-	
-		# autograde-cover 
-		 #python -O -m exam_pp.exam_post_pipeline data/llmjudge/$final  --question-set question-bank --prompt-class $promptclass  --min-relevant-judgment 2 --use-ratings --min-self-rating ${minrating} --leaderboard-out data/llmjudge/llmjudge-autograde-cover-leaderboard-$promptclass-minlevel-$minrating.correlation.tsv  --official-leaderboard data/llmjudge/official_llmjudge_leaderboard.json
-		echo ""
-	done
 
 
 
 	# inter-annotator agreement
-	python -O -m exam_pp.exam_post_pipeline data/llmjudge/$final  --question-set question-bank --prompt-class $promptclass  --min-relevant-judgment 2 --use-ratings  --inter-annotator-out data/llmjudge/llmjudge-autograde-inter-annotator-$promptclass.tex
+# 	python -O -m exam_pp.exam_post_pipeline data/llmjudge/$final  --question-set question-bank --prompt-class $promptclass  --min-relevant-judgment 2 --use-ratings  --inter-annotator-out data/llmjudge/llmjudge-autograde-inter-annotator-$promptclass.tex
 done
 
+
+final="nuggets-explain--nuggets-rate--all-llmjudge-passages_dev.json.gz"
+
+for promptclass in  NuggetSelfRatedPrompt; do
+	echo $promptclass
+
+
+
+	# inter-annotator agreement
+	# python -O -m exam_pp.exam_post_pipeline data/llmjudge/$final  --question-set question-bank --prompt-class $promptclass  --min-relevant-judgment 2 --use-ratings  --inter-annotator-out data/llmjudge/llmjudge-autograde-inter-annotator-$promptclass.tex
+done
+
+for promptclass in  FagB Sun FagB_few HELM Sun_few Thomas; do
+	echo $promptclass
+
+
+
+	# inter-annotator agreement
+	python -O -m exam_pp.exam_post_pipeline data/llmjudge/$directfinal  --question-set question-bank --prompt-class $promptclass --use-relevance-prompt  --min-relevant-judgment 2 --use-ratings  --inter-annotator-out data/llmjudge/llmjudge-autograde-inter-annotator-$promptclass.tex
+done
