@@ -6,6 +6,7 @@ from exam_pp.t5_qa import *
 from exam_pp.exam_grading import noodle
 from exam_pp.test_bank_prompts import *
 from exam_pp.query_loader import json_query_loader
+from exam_pp.exam_llm import Message, convert_to_messages
 
 
 @dataclass
@@ -50,6 +51,22 @@ class FourPrompts(SelfRatingDirectGradingPrompt):
     def check_answer(self, answer):
         return self.check_answer_rating(answer=answer)>0
 
+    def prompt_prefix_len(self):
+        return 0  # length of the system message in tokens.
+    
+
+    def generate_prompt_messages(self, context:str, full_paragraph:FullParagraphData, model_tokenizer, max_token_len) -> list[Message]:
+        # TODO: set system_message in constructor, count tokens for prompt_prefix_len
+        system_message = f'''Please rate how well the given passage meets the {self.criterion_name} criterion in relation to the query. The output should be a single score (0-3) indicating {self.criterion_desc}.'''
+        prompt = f'''Query: {self.query_text}
+Passage: {context}
+Score:'''
+
+        return [{"role":"system", "content":system_message}
+               , {"role":"user","content":prompt}
+              ]
+
+    
 
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
         '''Prompt that will be sent to the LLM.
@@ -104,6 +121,11 @@ class FourAggregationPrompt(SelfRatingDirectGradingPrompt):
         return  "Prompt to aggregate scores"
     
 
+    def generate_prompt_messages(self, context:str, full_paragraph:FullParagraphData, model_tokenizer, max_token_len) -> list[Message]:
+        # TODO: rewrite in terms of messages,
+
+        # in the mean-time here a wrapper around old str-based approach
+        return convert_to_messages(prompt=self.generate_prompt(str,full_paragraph=full_paragraph, model_tokenizer=model_tokenizer,max_token_len=max_token_len))
 
     def prompt_template(self, context:str, full_paragraph:FullParagraphData)->str:
         grade_filter = GradeFilter.noFilter()
@@ -220,14 +242,35 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
                         , help='json file with paragraph to grade with exam questions.The typical file pattern is `exam-xxx.jsonl.gz.'
                         )
 
-    modelPipelineOpts = {'text2text': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS:  Text2TextPipeline(model_name, max_token_len=MAX_TOKEN_LEN)
-                ,'question-answering': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS:  QaPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS)
-                ,'text-generation': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS:  TextGenerationPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
-                , 'llama': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS: LlamaTextGenerationPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS)
-                ,'vLLM': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS:  VllmPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
-                ,'OpenAI': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS:  OpenAIPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
-                }
 
+    parser.add_argument('--llm-api-key', type=str, metavar='KEY'
+                        , help='Set API key for LLM backend'
+                        , required=False
+                        )
+    parser.add_argument('--llm-base-url', type=str, metavar='URL'
+                        , required=False
+                        , help='URL of the LLM backend. Must be an endpoint for a Chat Completions protocol.'
+                        )
+    parser.add_argument('--llm-temperature', type=float, metavar='t'
+                        , required=False
+                        , help='Temperature passed to LLM backend.'
+                        )
+    parser.add_argument('--llm-stop-tokens', nargs='+', type=str, metavar='STR'
+                        , required=False
+                        , help='One (or more) stop tokens'
+                        )
+
+
+    modelPipelineOpts = {'text2text': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  Text2TextPipeline(model_name, max_token_len=MAX_TOKEN_LEN)
+                ,'question-answering': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  QaPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS)
+                ,'text-generation': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  TextGenerationPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
+                , 'llama': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs: LlamaTextGenerationPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS)
+                ,'vLLM': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  VllmPipelineOld(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
+                ,'OpenAI': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  OpenAIPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
+                , 'embed-text2text': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs:  EmbeddingText2TextPipeline(model_name, max_token_len=MAX_TOKEN_LEN, max_output_tokens=MAX_OUT_TOKENS) 
+                , 'chat-completions': lambda model_name, MAX_TOKEN_LEN, MAX_OUT_TOKENS, **kwargs: 
+                     ChatCompletionsPipeline(model_name, max_token_len=MAX_TOKEN_LEN,**kwargs)  # pass in additional config paremeters as **kwargs
+                }
     parser.add_argument('-o', '--out-file', type=str, metavar='exam-xxx.jsonl.gz', help='Output file name where paragraphs with exam grade annotations will be written to')
     parser.add_argument('--query-path', type=str, metavar='PATH', help='Path to read queries from')
     parser.add_argument('--use-nuggets', action='store_true', help="if set, assumed --question-path contains nuggets instead of questions")
@@ -289,9 +332,24 @@ The entries of the given RUBRIC input file will be augmented with exam grades, t
 
 
 
-    
-    llmPipeline = modelPipelineOpts[args.model_pipeline](args.model_name, args.max_tokens, args.max_out_tokens)
 
+    pipeline_args = {}
+    if args.llm_api_key is not None or args.llm_base_url is not None:
+        # chat_completions_client = openai_interface.default_openai_client()
+        chat_completions_client = openai_interface.createOpenAIClient(api_key=args.llm_api_key, base_url=args.llm_base_url)
+        pipeline_args["client"]=chat_completions_client
+
+        model_params = dict()
+        model_params["max_completion_tokens"]=args.max_out_tokens
+        model_params["temperature"]=args.llm_temperature
+        print("stop tokens:", ", ".join(args.llm_stop_tokens))
+        model_params["stop"] = args.llm_stop_tokens # e.g. for llama models:  ["<|eot_id|>","<|eom_id|>"]
+
+        pipeline_args["model_params"] = model_params
+
+    llmPipeline = modelPipelineOpts[args.model_pipeline](args.model_name, args.max_tokens, args.max_out_tokens, **pipeline_args)
+    
+    
     await noodle(
              llmPipeline=llmPipeline
            , question_set=question_set
