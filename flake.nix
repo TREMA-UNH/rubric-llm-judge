@@ -10,14 +10,14 @@
   inputs.exampp.url = "git+https://github.com/laura-dietz/rubric-internal";
 
   outputs = inputs@{ self, nixpkgs, flake-utils, dspy-nix, exampp, ... }:
-    flake-utils.lib.eachDefaultSystem (system: 
+    flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
         mkShell = target: (dspy-nix.lib.${system}.mkShell {
           inherit target;
           pythonOverrides = [ exampp.lib.${system}.pythonOverrides ];
-          packages = ps: [ ps.exampp ps.scikit-learn ps.mypy ps.pylatex];
+          pythonPackages = ps: [ ps.exampp ps.scikit-learn ps.mypy ps.pylatex];
         });
 
         pythonOverrides = pkgs.lib.composeOverlays
@@ -27,7 +27,7 @@
               name = "rubric_llm_judge";
               src = ./.;
               format = "pyproject";
-              propagatedBuildInputs = with self; [ 
+              propagatedBuildInputs = with self; [
                 setuptools
                 pydantic
                 exampp
