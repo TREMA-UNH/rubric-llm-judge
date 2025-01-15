@@ -115,7 +115,8 @@ def main(cmdargs=None):
                         )
 
     # parser.add_argument('--query-mapping-json', type=str, metavar='PATH', help='Path to read the query mapping as JSON')
-    parser.add_argument('--query-mapping-tsv', required=True, type=str, metavar='PATH', help='Path to read the query mapping as JSON')
+    parser.add_argument('--query-mapping-tsv', required=True, type=str, metavar='PATH', help='Path to read the query mapping as TSV')
+    parser.add_argument('--doc-mapping-tsv', required=True, type=str, metavar='PATH', help='Path to read the document mapping as TSV')
 
     parser.add_argument('--help-schema', action='store_true', help="Additional info on required JSON.GZ input format")
 
