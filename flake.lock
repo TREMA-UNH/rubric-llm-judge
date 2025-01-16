@@ -99,11 +99,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1736915816,
-        "narHash": "sha256-H+EhkZ1QbTpcBt3vDHRwyOXRqak24B1139mn+VtiEFs=",
+        "lastModified": 1737055243,
+        "narHash": "sha256-e0avVHrplhxzX3Q/1A5HbRoem+5x3MsnlY0oRF+JoB8=",
         "ref": "refs/heads/main",
-        "rev": "43c55458065b64e3087fb1d46cf24a17313a14ff",
-        "revCount": 415,
+        "rev": "0fdc169b953cc13484c70e0ac0e4eb10788b997f",
+        "revCount": 418,
         "type": "git",
         "url": "https://github.com/laura-dietz/rubric-internal"
       },
